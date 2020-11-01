@@ -95,14 +95,13 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _components_cart__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../components/cart */ "./src/components/cart/index.js");
-/* harmony import */ var _components_modal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/modal */ "./src/components/modal.js");
-/* harmony import */ var _components_filter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/filter */ "./src/components/filter/index.js");
-/* harmony import */ var _components_catalog__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/catalog */ "./src/components/catalog/index.js");
-/* harmony import */ var _components_slider__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/slider */ "./src/components/slider/index.js");
-/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./script */ "./src/assets/scripts/script.js");
+/* harmony import */ var _components_modal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../components/modal */ "./src/components/modal.js");
+/* harmony import */ var _components_filter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/filter */ "./src/components/filter/index.js");
+/* harmony import */ var _components_catalog__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/catalog */ "./src/components/catalog/index.js");
+/* harmony import */ var _components_slider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/slider */ "./src/components/slider/index.js");
+/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./script */ "./src/assets/scripts/script.js");
 // import data from '../../static/js/data.js';
-
+// import cart from '../../components/cart';
 
 
 
@@ -111,12 +110,12 @@ __webpack_require__.r(__webpack_exports__);
 
 const init = () => {
   // console.log('App init');
-  Object(_script__WEBPACK_IMPORTED_MODULE_5__["default"])();
-  Object(_components_cart__WEBPACK_IMPORTED_MODULE_0__["default"])();
-  Object(_components_filter__WEBPACK_IMPORTED_MODULE_2__["default"])();
-  Object(_components_catalog__WEBPACK_IMPORTED_MODULE_3__["default"])();
-  Object(_components_modal__WEBPACK_IMPORTED_MODULE_1__["default"])();
-  Object(_components_slider__WEBPACK_IMPORTED_MODULE_4__["default"])();
+  Object(_script__WEBPACK_IMPORTED_MODULE_4__["default"])(); // cart();
+
+  Object(_components_filter__WEBPACK_IMPORTED_MODULE_1__["default"])();
+  Object(_components_catalog__WEBPACK_IMPORTED_MODULE_2__["default"])();
+  Object(_components_modal__WEBPACK_IMPORTED_MODULE_0__["default"])();
+  Object(_components_slider__WEBPACK_IMPORTED_MODULE_3__["default"])();
 };
 
 if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading') {
@@ -191,81 +190,310 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./src/components/cart/addToCart.js":
-/*!******************************************!*\
-  !*** ./src/components/cart/addToCart.js ***!
-  \******************************************/
+/***/ "./src/components/catalog/CartService.js":
+/*!***********************************************!*\
+  !*** ./src/components/catalog/CartService.js ***!
+  \***********************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (item => {});
+class CartService {
+  constructor() {
+    this.keyName = "cart";
+    this.cart = this.getProducts(); // []
+  }
+
+  getProducts() {
+    const productsLocalStorage = localStorage.getItem(this.keyName);
+    if (!productsLocalStorage) return [];
+    return JSON.parse(productsLocalStorage);
+  }
+
+  putProducts(id) {
+    if (!id && !id.length) return;
+    const products = this.getProducts();
+    const index = products.findIndex(item => {
+      return item.id === id;
+    });
+
+    if (index !== -1) {
+      const amount = products[index].amount;
+      products[index].amount = amount + 1;
+    } else {
+      products.push({
+        id,
+        amount: 1
+      });
+    }
+
+    localStorage.setItem(this.keyName, JSON.stringify(products));
+  }
+
+  getCartLength() {
+    const cart = this.getProducts();
+    return cart.length;
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (CartService);
 
 /***/ }),
 
-/***/ "./src/components/cart/index.js":
-/*!**************************************!*\
-  !*** ./src/components/cart/index.js ***!
-  \**************************************/
+/***/ "./src/components/catalog/Catalog.js":
+/*!*******************************************!*\
+  !*** ./src/components/catalog/Catalog.js ***!
+  \*******************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _components_cart_addToCart__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/cart/addToCart */ "./src/components/cart/addToCart.js");
- // import getBookById from "@/components/cart/getBookById";
-// import openModal from "@/components/cart/openModal";
+class Catalog {
+  constructor(cartService, modalService) {
+    this.cartService = cartService;
+    this.modalService = modalService;
+    this.catalogListBox = document.querySelector(".catalog__books-list");
+    this.init();
+    this.inited = false;
+  } // handleSetLocalStorage(element, name) {
+  //     const result = localStorageProducts.putProducts(name);
+  //     productsCounter();
+  // }
+  // const printCatalogItems = () => {
+  //     // Item acticle
+  //     const itemArticle = document.createElement("article");
+  //     itemArticle.classList.add("card");
+  //     // Item link
+  //     const itemLink = document.createElement("a");
+  //     itemArticle.classList.add("card__inner");
+  //     itemArticle.classList.add("card");
+  //     // Item img
+  //     const itemImage = document.createElement("img");
+  //     completedButton.innerHTML = '<img
+  //     class="card__img"
+  //     src="img/books/${uri}.jpg"
+  //     width="148"
+  //     height="208"
+  //     alt="${name}"
+  // />';
+  // }
 
-/* harmony default export */ __webpack_exports__["default"] = (() => {
-  // console.log('Catalog inited');
-  const catalog = document.querySelector('[data-catalog]');
-  if (!catalog) return; // Навесить слушатели на каталог
 
-  catalog.addEventListener('click', async e => {
-    e.preventDefault();
-    const card = e.target.closest('.card');
+  init() {
+    if (!this.inited) {
+      // Навесить слушатели на каталог
+      this.catalogListBox.addEventListener("click", e => {
+        e.preventDefault();
+        const card = e.target.closest(".card"); // Открытие модального окна
 
-    if (e.target.closest('.card .card__inner')) {
-      // // Добавление в корзину
-      const {
-        id
-      } = card.dataset;
-      const book = await getBookById(id);
-      await Object(_components_cart_addToCart__WEBPACK_IMPORTED_MODULE_0__["default"])(book);
-    } // // Открытие модального окна
+        if (e.target.closest(".card .card__inner")) {
+          const {
+            id
+          } = card.dataset;
+          const book = this.findBook(id);
+          const htmlBook = this.renderHtmlForModal(book);
+          this.modalService.open(htmlBook);
+        } // Добавление в корзину
 
 
-    if (e.target.closest('.card .card__buy')) {
-      // // Добавление в корзину
-      const {
-        id
-      } = card.dataset;
-      const book = await getBookById(id);
-      const htmlBook = renderHtmlForModal(book);
-      await openModal(htmlBook);
+        if (e.target.closest(".card .card__buy")) {
+          const {
+            id
+          } = card.dataset;
+          this.addProductToCart(id);
+        }
+      });
     }
-  }); // Находим куда вывести корзину, если этого места нет, то ничего не делаем
-  // Получить данные корзины
-  // Печатаем корзину
-  // Навесить слушатели
-  // // Очистка корзины
-  // // // Затираем массив
-  // // Поменять количество в строке
-  // // Удалять элементы из корзины
-}); // const cart = [];
-// renderCard(cartList); // [{name: 'Books'}]
-// addToCart(bookItem); //
-// 1. Вывод состояния корзины на страницу
-// 2. Метод добавления товара в корзину
-// 3. Метод удаления товара из корзины
-// 4. Метод удаления всех товаров из корзины
-// 5. Метод изменения количества в плюс
-// 6. Метод изменения количества в минус
-// 7. Метод ввода значения руками
-// 8. Метод вывода количества товаров на иконку Корзины
-// 9. Метод вывода количества элементов
-// 10. Метод вывода суммы корзины
+
+    this.inited = true;
+  }
+
+  findBook(id) {
+    const index = books.findIndex(item => {
+      return item.uri === id;
+    });
+    return books[index];
+  }
+
+  openModal() {}
+
+  addProductToCart(id) {
+    this.cartService.putProducts(id);
+  }
+
+  renderHtmlForModal(product) {
+    return `
+              <div class="product">
+                <div class="product__img-wrap">
+                  <img
+                    src="img/books/${product.uri}.jpg"
+                    alt="${product.name}"
+                    width="422"
+                    height="594"
+                  />
+                </div>
+                <div class="product__text-info">
+                  <h2 class="product__title">${product.name}</h2>
+                  <div class="rating product__rating">
+                    <span class="rating__stars">
+                      <svg width="18" height="18">
+                        <use xlink:href="#star"></use>
+                      </svg>
+                      <svg width="18" height="18">
+                        <use xlink:href="#star"></use>
+                      </svg>
+                      <svg width="18" height="18">
+                        <use xlink:href="#star"></use>
+                      </svg>
+                      <svg width="18" height="18">
+                        <use xlink:href="#star"></use>
+                      </svg>
+                      <svg width="18" height="18">
+                        <use xlink:href="#star-half"></use>
+                      </svg>
+                    </span>
+                    <span class="rating__num">4.6/5.0</span>
+                    <span class="rating__review">20 отзывов</span>
+                  </div>
+                  <table class="product__table-info">
+                    <tr>
+                      <th>Автор:</th>
+                      <td>
+                        <a href="">Девид Огилви</a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Артикул:</th>
+                      <td>6649507</td>
+                    </tr>
+                    <tr>
+                      <th>В наличии:</th>
+                      <td>5 шт.</td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="product__descr">
+                  <h3 class="product__subtitle">Описание:</h3>
+                  <p>
+                  ${product.desc}
+                  </p>
+                  <div class="product__actions">
+                    <button class="btn  btn--price">
+                      ${product.price} ₽
+                      <span class="btn__sm-text">
+                        <svg class="btn__icon" width="14" height="14">
+                          <use xlink:href="#plus"></use>
+                        </svg>
+                        <span>В корзину</span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+    `;
+  }
+
+  render() {
+    let catalogList = "";
+    books.forEach(({
+      name,
+      desc,
+      price,
+      uri,
+      type
+    }) => {
+      catalogList += `
+                <article class="card" data-id="${uri}">
+                    <a class="card__inner" href="index.html#klienty-na-vsyu-zhizn">
+                    <img
+                        class="card__img"
+                        src="img/books/${uri}.jpg"
+                        width="148"
+                        height="208"
+                        alt="${name}"
+                    />
+                    <h2 class="card__title">${name}</h2>
+                    <p class="card__price">${price} ₽</p>
+                    </a>
+                    <button class="btn btn--sm card__buy" data-id="${uri}">
+                        <svg class="btn__icon" width="14" height="14">
+                            <use xlink:href="#plus"></use>
+                        </svg>
+                    <span>В корзину</span>
+                    </button>
+              </article>
+            `;
+    });
+    this.catalogListBox.innerHTML = catalogList;
+  }
+
+} // const catalogListBox = document.querySelector('.catalog__books-list');
+// // // Добавление в корзину
+// const productsStore = localStorageProducts.getProducts();
+// const cartCounter = document.querySelector(".page-header__cart-num");
+// const productsCounter = () => {
+//     cartCounter.innerHTML = productsStore.length;
+// };
+// //   productsCounter();
+
+
+/* harmony default export */ __webpack_exports__["default"] = (Catalog);
+
+/***/ }),
+
+/***/ "./src/components/catalog/ModalService.js":
+/*!************************************************!*\
+  !*** ./src/components/catalog/ModalService.js ***!
+  \************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class ModalService {
+  constructor() {
+    this.modal = document.querySelector(".modal");
+    this.isOpen = false;
+    if (!this.modal) return;
+    this.init();
+  }
+
+  init() {
+    // слушаем
+    // кнопку закрыть
+    // escape
+    window.addEventListener("keyup", e => {
+      if (e.key === "Escape") {
+        this.close();
+      }
+    });
+  }
+
+  open(html) {
+    if (!html && !html.length) return;
+    this.isOpen = true;
+    this.renderModal(html);
+    document.querySelector('html').classList.add("js-modal-open");
+    this.modal.classList.add("modal--open");
+  }
+
+  close() {
+    this.isOpen = false;
+    document.querySelector('html').classList.remove("js-modal-open");
+    this.modal.classList.remove("modal--open");
+  }
+
+  renderModal(html) {
+    const content = this.modal.querySelector('[data-modal-content]');
+    content.innerHTML = html;
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (ModalService);
 
 /***/ }),
 
@@ -278,43 +506,29 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _components_catalog_printCatalogList__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/catalog/printCatalogList */ "./src/components/catalog/printCatalogList.js");
-/* harmony import */ var _components_catalog_localStorageCatalog__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/components/catalog/localStorageCatalog */ "./src/components/catalog/localStorageCatalog.js");
+/* harmony import */ var _components_catalog_Catalog__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/catalog/Catalog */ "./src/components/catalog/Catalog.js");
+/* harmony import */ var _components_catalog_CartService__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/components/catalog/CartService */ "./src/components/catalog/CartService.js");
+/* harmony import */ var _components_catalog_ModalService__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/components/catalog/ModalService */ "./src/components/catalog/ModalService.js");
+
 
 
 /* harmony default export */ __webpack_exports__["default"] = (() => {
-  const catalog = document.querySelector('.catalog__books-list');
+  const catalog = document.querySelector(".catalog__books-list");
   if (!catalog) return;
-  Object(_components_catalog_printCatalogList__WEBPACK_IMPORTED_MODULE_0__["default"])();
-  Object(_components_catalog_localStorageCatalog__WEBPACK_IMPORTED_MODULE_1__["default"])(); // Навесить слушатели на каталог
-
-  catalog.addEventListener('click', async e => {
-    e.preventDefault(); // const card = e.target.closest('.card');
-    // if (e.target.closest('.card .card__inner')) {
-    //   // // // Добавление в корзину
-    //   // const {id} = card.dataset;
-    //   // const book = await getBookById(id);
-    //   // await addToCart(book);
-    // }
-    // // Открытие модального окна
-    // if (e.target.closest('.card .card__buy')) {
-    //   // // Добавление в корзину
-    //   const {id} = card.dataset;
-    //   const book = await getBookById(id);
-    //   const htmlBook = renderHtmlForModal(book);
-    //   await openModal(htmlBook);
-    // }
-  });
+  const cartService = new _components_catalog_CartService__WEBPACK_IMPORTED_MODULE_1__["default"]();
+  const modalService = new _components_catalog_ModalService__WEBPACK_IMPORTED_MODULE_2__["default"]();
+  const catalogService = new _components_catalog_Catalog__WEBPACK_IMPORTED_MODULE_0__["default"](cartService, modalService);
+  catalogService.render();
 }); //   Находим куда вывести каталог (все книги), если этого места нет, то ничего не делаем
 // Получить данные каталога
 // Печатаем каталог
 // Навесить слушатели
 //Добавить в корзину
 //Получить данные по количеству в корзину
-//Открытие модалки 
+//Открытие модалки
 //Получить доп данные для модалки
 // Закрытие модалки
-// Добавить в корзину 
+// Добавить в корзину
 // Удалить из корзины
 // Реализация переключения слайдера
 // Находим куда вывести слайдер (все книги)
@@ -322,141 +536,6 @@ __webpack_require__.r(__webpack_exports__);
 // Навесить слушатели
 //Добавить в корзину
 //Открытие модалки
-
-/***/ }),
-
-/***/ "./src/components/catalog/localStorageCatalog.js":
-/*!*******************************************************!*\
-  !*** ./src/components/catalog/localStorageCatalog.js ***!
-  \*******************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (localStorageCatalogList => {
-  class LocalStorageProducts {
-    constructor() {
-      this.keyName = 'products';
-    }
-
-    getProducts() {
-      const productsLocalStorage = localStorage.getItem(this.keyName);
-
-      if (productsLocalStorage !== null) {
-        return JSON.parse(productsLocalStorage);
-      }
-
-      return [];
-    }
-
-    putProducts(name) {
-      let products = this.getProducts();
-      let pushProduct = false;
-      const index = products.indexOf(name);
-
-      if (index === -1) {
-        products.push(name);
-        pushProduct = true;
-      } else {
-        products.splice(index, 1);
-      }
-
-      localStorage.setItem(this.keyName, JSON.stringify(products));
-      return {
-        pushProduct,
-        products
-      };
-    }
-
-  }
-
-  const localStorageProducts = new LocalStorageProducts();
-});
-
-/***/ }),
-
-/***/ "./src/components/catalog/printCatalogList.js":
-/*!****************************************************!*\
-  !*** ./src/components/catalog/printCatalogList.js ***!
-  \****************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (print => {
-  const catalogListBox = document.querySelector('.catalog__books-list');
-
-  class Products {
-    // handleSetLocalStorage(element, name) {
-    //     const result = localStorageProducts.putProducts(name);
-    //     productsCounter();
-    // }
-    // const printCatalogItems = () => {
-    //     // Item acticle
-    //     const itemArticle = document.createElement("article");
-    //     itemArticle.classList.add("card");
-    //     // Item link
-    //     const itemLink = document.createElement("a");
-    //     itemArticle.classList.add("card__inner");
-    //     itemArticle.classList.add("card");
-    //     // Item img
-    //     const itemImage = document.createElement("img");
-    //     completedButton.innerHTML = '<img
-    //     class="card__img"
-    //     src="img/books/${uri}.jpg"
-    //     width="148"
-    //     height="208"
-    //     alt="${name}"
-    // />';
-    // }
-    render() {
-      let catalogList = '';
-      books.forEach(({
-        name,
-        desc,
-        price,
-        uri,
-        type
-      }) => {
-        catalogList += `
-                <article class="card">
-                    <a class="card__inner" href="index.html#klienty-na-vsyu-zhizn">
-                    <img
-                        class="card__img"
-                        src="img/books/${uri}.jpg"
-                        width="148"
-                        height="208"
-                        alt="${name}"
-                    />
-                    <h2 class="card__title">${name}</h2>
-                    <p class="card__price">${price} ₽</p>
-                    </a>
-                    <button class="btn btn--sm card__buy" onclick="productsPage.handleSetLocalStorage(this, '${name}');">
-                    <svg class="btn__icon" width="14" height="14">
-                        <use xlink:href="#plus"></use>
-                    </svg>
-                    <span>В корзину</span>
-                    </button>
-              </article>
-            `;
-      });
-      catalogListBox.innerHTML = catalogList;
-    }
-
-  }
-
-  const productsPage = new Products();
-  productsPage.render(); // const catalogListBox = document.querySelector('.catalog__books-list');
-  // // // Добавление в корзину
-  // const productsStore = localStorageProducts.getProducts();
-  // const cartCounter = document.querySelector(".page-header__cart-num");
-  // const productsCounter = () => {
-  //     cartCounter.innerHTML = productsStore.length;
-  // };
-  // //   productsCounter();
-});
 
 /***/ }),
 

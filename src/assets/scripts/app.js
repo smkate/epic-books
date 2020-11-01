@@ -1,5 +1,5 @@
 // import data from '../../static/js/data.js';
-import cart from '../../components/cart';
+// import cart from '../../components/cart';
 import modal from '../../components/modal';
 import filter from '../../components/filter';
 import catalog from '../../components/catalog';
@@ -11,7 +11,7 @@ const init = () => {
   // console.log('App init');
 
   libs();
-  cart();
+  // cart();
   filter();
   catalog();
   modal();
