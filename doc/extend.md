@@ -470,8 +470,8 @@ note that this markup requires to add attributes to your top `html` tag.
 
 Signal to search engines and others "Use this URL for this page!" Useful when
 parameters after a `#` or `?` is used to control the display state of a page.
-`https://www.example.com/cart.html?shopping-cart-open=true` can be indexed as
-the cleaner, more accurate `https://www.example.com/cart.html`.
+`https://www.example.com/index.html?shopping-index-open=true` can be indexed as
+the cleaner, more accurate `https://www.example.com/index.html`.
 
 ```html
 <link rel="canonical" href="">

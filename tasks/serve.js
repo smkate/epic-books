@@ -10,7 +10,7 @@ const serve = cb => {
   browserSync.init({
     server: config.output,
     startPath: 'index.html',
-    open: false,
+    open: true,
     port: 8081
   });
 

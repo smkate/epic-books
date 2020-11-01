@@ -4,7 +4,7 @@ const plumber = require('gulp-plumber');
 const config = require('./config');
 
 const copyStatic = () => {
-  return src(config.static.input, { read: false })
+  return src(config.static.input)
     .pipe(plumber(config.notify))
     .pipe(dest(config.static.output));
 };

@@ -1,0 +1,35 @@
+export default (localStorageCatalogList) => {
+class LocalStorageProducts {
+    constructor() {
+        this.keyName = 'products';
+    }
+
+    getProducts() {
+        const productsLocalStorage = localStorage.getItem(this.keyName);
+        if (productsLocalStorage !== null) {
+            return JSON.parse(productsLocalStorage);
+        }
+        return [];
+    }
+
+    putProducts(name) {
+        let products = this.getProducts();
+        let pushProduct = false;
+        const index = products.indexOf(name);
+
+        if (index === -1) {
+            products.push(name);
+            pushProduct = true;
+        } else {
+            products.splice(index, 1);
+        }
+
+        localStorage.setItem(this.keyName, JSON.stringify(products));
+
+        return { pushProduct, products }
+    }
+}
+
+const localStorageProducts = new LocalStorageProducts();
+
+};
