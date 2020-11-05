@@ -95,33 +95,28 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _components_modal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../components/modal */ "./src/components/modal.js");
-/* harmony import */ var _components_filter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/filter */ "./src/components/filter/index.js");
-/* harmony import */ var _components_catalog__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/catalog */ "./src/components/catalog/index.js");
-/* harmony import */ var _components_slider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/slider */ "./src/components/slider/index.js");
-/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./script */ "./src/assets/scripts/script.js");
+/* harmony import */ var _components_cart__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../components/cart */ "./src/components/cart/index.js");
+/* harmony import */ var _components_catalog__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/catalog */ "./src/components/catalog/index.js");
+/* harmony import */ var _components_slider__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/slider */ "./src/components/slider/index.js");
+/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./script */ "./src/assets/scripts/script.js");
 // import data from '../../static/js/data.js';
-// import cart from '../../components/cart';
-
+// import filter from "../../components/filter";
 
 
 
 
 
 const init = () => {
-  // console.log('App init');
-  Object(_script__WEBPACK_IMPORTED_MODULE_4__["default"])(); // cart();
-
-  Object(_components_filter__WEBPACK_IMPORTED_MODULE_1__["default"])();
-  Object(_components_catalog__WEBPACK_IMPORTED_MODULE_2__["default"])();
-  Object(_components_modal__WEBPACK_IMPORTED_MODULE_0__["default"])();
-  Object(_components_slider__WEBPACK_IMPORTED_MODULE_3__["default"])();
+  Object(_script__WEBPACK_IMPORTED_MODULE_3__["default"])();
+  Object(_components_catalog__WEBPACK_IMPORTED_MODULE_1__["default"])();
+  Object(_components_slider__WEBPACK_IMPORTED_MODULE_2__["default"])();
+  Object(_components_cart__WEBPACK_IMPORTED_MODULE_0__["default"])(); // filter();
 };
 
-if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading') {
+if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
   init();
 } else {
-  document.addEventListener('DOMContentLoaded', () => init());
+  document.addEventListener("DOMContentLoaded", () => init());
 }
 
 /***/ }),
@@ -141,52 +136,277 @@ __webpack_require__.r(__webpack_exports__);
   // корректно и не вызывает ошибок в консоли браузера только на главной.
   // Одна из ваших задач: сделать так, чтобы на странице корзины в консоли
   // браузера не было ошибок.
-  // Кастомные селекты (кроме выбора языка)
-  new Choices('.field-select:not(#lang) select.field-select__select', {
-    searchEnabled: false,
-    shouldSort: false
-  }); // Кастомный селект выбора языка отдельно
+  const selectLang = document.querySelector(".field-select:not(#lang) select.field-select__select");
+  const selects = document.querySelector("#lang select.field-select__select");
 
-  new Choices('#lang select.field-select__select', {
-    searchEnabled: false,
-    shouldSort: false,
-    callbackOnCreateTemplates: function (template) {
-      return {
-        item: (classNames, data) => {
-          return template(`
-            <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : classNames.itemSelectable}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
+  if (selects) {
+    // Кастомные селекты (кроме выбора языка)
+    new Choices(".field-select:not(#lang) select.field-select__select", {
+      searchEnabled: false,
+      shouldSort: false
+    });
+  }
+
+  if (selectLang) {
+    // Кастомный селект выбора языка отдельно
+    new Choices("#lang select.field-select__select", {
+      searchEnabled: false,
+      shouldSort: false,
+      callbackOnCreateTemplates: function (template) {
+        return {
+          item: (classNames, data) => {
+            return template(`
+            <div class="${classNames.item} ${data.highlighted ? classNames.highlightedState : classNames.itemSelectable}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ""} ${data.disabled ? 'aria-disabled="true"' : ""}>
               ${getLangInSelectIcon(data.value)} ${data.label.substr(0, 3)}
             </div>
           `);
-        },
-        choice: (classNames, data) => {
-          return template(`
-            <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${this.config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
+          },
+          choice: (classNames, data) => {
+            return template(`
+            <div class="${classNames.item} ${classNames.itemChoice} ${data.disabled ? classNames.itemDisabled : classNames.itemSelectable}" data-select-text="${this.config.itemSelectText}" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : "data-choice-selectable"} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
               ${getLangInSelectIcon(data.value)} ${data.label}
             </div>
           `);
-        }
-      };
+          }
+        };
+      }
+    });
+
+    function getLangInSelectIcon(value) {
+      if (value == "ru") return '<span class="field-select__lang-ru"></span>';else if (value == "en") return '<span class="field-select__lang-en"></span>';
+      return '<span class="field-select__lang-null"></span>';
     }
-  });
+  }
 
-  function getLangInSelectIcon(value) {
-    if (value == 'ru') return '<span class="field-select__lang-ru"></span>';else if (value == 'en') return '<span class="field-select__lang-en"></span>';
-    return '<span class="field-select__lang-null"></span>';
-  } // Выбор диапазона цен
+  console.log(selects, selectLang);
+  const range = document.querySelector("#price-range");
 
-
-  var slider = document.getElementById('price-range');
-  noUiSlider.create(slider, {
-    start: [400, 1000],
-    connect: true,
-    step: 100,
-    range: {
-      'min': 200,
-      'max': 2000
-    }
-  });
+  if (range) {
+    // Выбор диапазона цен
+    var slider = document.getElementById("price-range");
+    noUiSlider.create(slider, {
+      start: [400, 1000],
+      connect: true,
+      step: 100,
+      range: {
+        min: 200,
+        max: 2000
+      }
+    });
+  }
 });
+
+/***/ }),
+
+/***/ "./src/components/ApiService.js":
+/*!**************************************!*\
+  !*** ./src/components/ApiService.js ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class ApiService {
+  constructor() {}
+
+  findBook(id) {
+    const index = books.findIndex(item => {
+      return item.uri === id;
+    });
+    return books[index];
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (ApiService);
+
+/***/ }),
+
+/***/ "./src/components/cart/Cart.js":
+/*!*************************************!*\
+  !*** ./src/components/cart/Cart.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ApiService__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../ApiService */ "./src/components/ApiService.js");
+
+
+class Cart {
+  constructor(cartService) {
+    this.cartService = cartService;
+    this.cartBox = document.querySelector("[data-cart-content]");
+    this.api = new _ApiService__WEBPACK_IMPORTED_MODULE_0__["default"]();
+
+    if (this.cartBox) {
+      this.renderCart();
+      this.init();
+    }
+  }
+
+  init() {
+    // this.cartBox.addEventListener('click', (e) => {
+    // const {target} = e;
+    this.cartBox.addEventListener('click', ({
+      target
+    }) => {
+      if (target.closest('[data-plus]')) {
+        const id = target.dataset.plus;
+        this.cartService.putProducts(id); // this.updateRow();
+        // refreshCount
+      }
+
+      if (target.closest('[data-minus]')) {
+        const id = target.dataset.minus;
+        this.cartService.removeProducts(id); // removeAllProducts
+        // this.updateRow();
+        // refreshCount
+      }
+
+      if (target.closest('[data-delete]')) {
+        const id = target.dataset.delete;
+        this.cartService.deleteProduct(id); // refreshCount
+      }
+    }); // TODO обработчик ввода
+    // обновление количества в поле ввода
+    // Пересчет суммы корзины 
+    // вывод количстве элементов this.cartService.getCartLength();
+    // во все деньги добавить разряды от 10 000 // 9999 // 99 9999 // 8888
+  }
+
+  refreshCount() {// Товар, товара, товаров // pieces
+    // title.innerHTML = `В корзине ${this.cartService.getCartLength()} ${pieces()}`;
+  }
+
+  renderCart(html) {
+    const books = this.cartService.getProducts();
+    console.log(books);
+    let cartContent = `
+      <tr class="cart__table-headers">
+        <th class="cart__col-1"></th>
+        <th class="cart__col-2">Товар</th>
+        <th class="cart__col-3">Кол-во</th>
+        <th class="cart__col-4">Цена</th>
+        <th class="cart__col-5"></th>
+      </tr>
+    `; // books.forEach((item) => {
+    //   const book = this.api.findBook(item.id);
+    //   console.log(book);
+    //   cartContent += this.renderHtmlForCart({...book, amount: item.amount});
+    // });
+
+    books.forEach(({
+      id,
+      amount
+    }) => {
+      const book = this.api.findBook(id);
+      cartContent += this.renderHtmlForCart({ ...book,
+        amount
+      });
+    });
+    const totalPrice = "2 220000";
+    cartContent += `
+      <tr>
+        <td class="cart__products-price" colspan="5">
+          Итого к оплате:
+          <strong
+            class="cart__products-price-num"
+            id="cart-products-price-num"
+            >${totalPrice} ₽</strong
+          >
+        </td>
+      </tr>
+    `;
+    this.cartBox.innerHTML = cartContent;
+  }
+
+  renderHtmlForCart({
+    uri,
+    name,
+    price,
+    amount
+  }) {
+    return `
+          <tr class="cart__product">
+            <td class="cart__col-1">
+              <img class="cart__item-img" src="img/books/${uri}.jpg" alt="${uri}">
+              </td>
+                <td class="cart__col-2">
+                <div class="cart__item-name">${name}</div>
+              </td>
+
+              <td class="cart__col-3">
+                <div class="field-num  field-num--bg-tran">
+                    <span class="field-num__input-wrap">
+                      <button class="field-num__btn-minus" data-minus="${uri}" type="button">-</button>
+                      <input class="field-num__input" type="number" value="${amount}" step="1" min="1"/>
+                      <button class="field-num__btn-plus" data-plus="${uri}" type="button">+</button>
+                    </span>
+                </div>
+              </td>
+
+              <td class="cart__col-4">
+                <span class="cart__item-price">${amount * price} ₽</span>
+              </td>
+
+              <td class="cart__col-5">
+                <button class="close cart__product-del-btn" data-delete="${uri}" type="button">
+                    <svg width="16" height="16">
+                      <use xlink:href="#close"></use>
+                    </svg>
+                </button>
+            </td>
+          </tr>
+      `;
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Cart);
+
+/***/ }),
+
+/***/ "./src/components/cart/index.js":
+/*!**************************************!*\
+  !*** ./src/components/cart/index.js ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _components_cart_Cart__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/cart/Cart */ "./src/components/cart/Cart.js");
+/* harmony import */ var _components_catalog_CartService__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/components/catalog/CartService */ "./src/components/catalog/CartService.js");
+
+
+/* harmony default export */ __webpack_exports__["default"] = (() => {
+  const cartBox = document.querySelector(".cart__table");
+  if (!cartBox) return;
+  const cart = new _components_cart_Cart__WEBPACK_IMPORTED_MODULE_0__["default"](_components_catalog_CartService__WEBPACK_IMPORTED_MODULE_1__["default"]); // cart.render(); 
+}); // Находим куда вывести корзину, если этого места нет, то ничего не делаем
+// Получить данные корзины
+// Печатаем корзину
+// Навесить слушатели
+// // Очистка корзины
+// // // Затираем массив
+// // Поменять количество в строке
+// // Удалять элементы из корзины
+// const cart = [];
+// renderCard(cartList); // [{name: 'Books'}]
+// addToCart(bookItem); //
+// 1. Вывод состояния корзины на страницу
+// 2. Метод добавления товара в корзину
+// 3. Метод удаления товара из корзины
+// 4. Метод удаления всех товаров из корзины
+// 5. Метод изменения количества в плюс
+// 6. Метод изменения количества в минус
+// 7. Метод ввода значения руками
+// 8. Метод вывода количества товаров на иконку Корзины
+// 9. Метод вывода количества элементов
+// 10. Метод вывода суммы корзины
 
 /***/ }),
 
@@ -202,7 +422,9 @@ __webpack_require__.r(__webpack_exports__);
 class CartService {
   constructor() {
     this.keyName = "cart";
-    this.cart = this.getProducts(); // []
+    this.cart = this.getProducts();
+    this.cartWidget = document.querySelector(".page-header__cart-num");
+    this.updateCartWidget();
   }
 
   getProducts() {
@@ -228,17 +450,75 @@ class CartService {
       });
     }
 
+    this.updateCartWidget();
     localStorage.setItem(this.keyName, JSON.stringify(products));
+  }
+
+  removeProducts(id) {
+    if (!id && !id.length) return;
+    const products = this.getProducts();
+    const index = products.findIndex(item => {
+      return item.id === id;
+    });
+
+    if (index !== -1) {
+      const amount = products[index].amount;
+
+      if (amount > 1) {
+        products[index].amount = amount - 1;
+      } else {
+        this.deleteProduct(id);
+      }
+    }
+
+    this.updateCartWidget();
+    localStorage.setItem(this.keyName, JSON.stringify(products));
+  }
+
+  deleteProduct(id) {
+    if (!id && !id.length) return;
+    const products = this.getProducts();
+    const index = products.findIndex(item => {
+      return item.id === id;
+    });
+
+    if (index !== -1) {
+      products.splice(index, 1);
+    }
+
+    this.updateCartWidget();
+    localStorage.setItem(this.keyName, JSON.stringify(products));
+  }
+
+  removeAllProducts() {
+    const books = this.getProducts();
+    books.forEach(({
+      id
+    }) => {
+      this.deleteProduct(id);
+    });
+    this.updateCartWidget();
   }
 
   getCartLength() {
     const cart = this.getProducts();
-    return cart.length;
+    let count = 0;
+    cart.forEach(item => {
+      count += item.amount;
+    });
+    return count;
   }
+
+  updateCartWidget() {
+    this.cartWidget.innerHTML = this.getCartLength();
+  }
+
+  getPromotionSum() {}
 
 }
 
-/* harmony default export */ __webpack_exports__["default"] = (CartService);
+const cartService = new CartService();
+/* harmony default export */ __webpack_exports__["default"] = (cartService);
 
 /***/ }),
 
@@ -252,73 +532,38 @@ class CartService {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 class Catalog {
-  constructor(cartService, modalService) {
+  constructor(selector, cartService, modalService) {
     this.cartService = cartService;
     this.modalService = modalService;
-    this.catalogListBox = document.querySelector(".catalog__books-list");
+    this.catalogListBox = document.querySelector(selector);
     this.init();
-    this.inited = false;
-  } // handleSetLocalStorage(element, name) {
-  //     const result = localStorageProducts.putProducts(name);
-  //     productsCounter();
-  // }
-  // const printCatalogItems = () => {
-  //     // Item acticle
-  //     const itemArticle = document.createElement("article");
-  //     itemArticle.classList.add("card");
-  //     // Item link
-  //     const itemLink = document.createElement("a");
-  //     itemArticle.classList.add("card__inner");
-  //     itemArticle.classList.add("card");
-  //     // Item img
-  //     const itemImage = document.createElement("img");
-  //     completedButton.innerHTML = '<img
-  //     class="card__img"
-  //     src="img/books/${uri}.jpg"
-  //     width="148"
-  //     height="208"
-  //     alt="${name}"
-  // />';
-  // }
-
+  }
 
   init() {
-    if (!this.inited) {
-      // Навесить слушатели на каталог
-      this.catalogListBox.addEventListener("click", e => {
-        e.preventDefault();
-        const card = e.target.closest(".card"); // Открытие модального окна
+    // Навесить слушатели на каталог
+    this.catalogListBox.addEventListener("click", e => {
+      e.preventDefault(); // Открытие модального окна
 
-        if (e.target.closest(".card .card__inner")) {
-          const {
-            id
-          } = card.dataset;
-          const book = this.findBook(id);
-          const htmlBook = this.renderHtmlForModal(book);
-          this.modalService.open(htmlBook);
-        } // Добавление в корзину
+      if (e.target.closest(".card .card__inner")) {
+        const card = e.target.closest(".card");
+        const {
+          id
+        } = card.dataset;
+        const book = this.findBook(id);
+        const htmlBook = this.renderHtmlForModal(book);
+        this.modalService.open(htmlBook);
+      } // Добавление в корзину
 
 
-        if (e.target.closest(".card .card__buy")) {
-          const {
-            id
-          } = card.dataset;
-          this.addProductToCart(id);
-        }
-      });
-    }
-
-    this.inited = true;
-  }
-
-  findBook(id) {
-    const index = books.findIndex(item => {
-      return item.uri === id;
+      if (e.target.closest("[data-add-cart]")) {
+        const item = e.target.closest("[data-add-cart]");
+        const {
+          id
+        } = item.dataset;
+        this.addProductToCart(id);
+      }
     });
-    return books[index];
   }
-
-  openModal() {}
 
   addProductToCart(id) {
     this.cartService.putProducts(id);
@@ -362,16 +607,16 @@ class Catalog {
                     <tr>
                       <th>Автор:</th>
                       <td>
-                        <a href="">Девид Огилви</a>
+                        <a href="">${product.author}</a>
                       </td>
                     </tr>
                     <tr>
                       <th>Артикул:</th>
-                      <td>6649507</td>
+                      <td>${product.article}</td>
                     </tr>
                     <tr>
                       <th>В наличии:</th>
-                      <td>5 шт.</td>
+                      <td>${product.store} шт.</td>
                     </tr>
                   </table>
                 </div>
@@ -381,7 +626,7 @@ class Catalog {
                   ${product.desc}
                   </p>
                   <div class="product__actions">
-                    <button class="btn  btn--price">
+                    <button class="btn  btn--price" data-id="${product.uri}" data-add-cart>
                       ${product.price} ₽
                       <span class="btn__sm-text">
                         <svg class="btn__icon" width="14" height="14">
@@ -396,49 +641,55 @@ class Catalog {
     `;
   }
 
+  renderOne({
+    name,
+    price,
+    uri
+  }) {
+    return `
+      <article class="card" data-id="${uri}">
+        <a class="card__inner" href="index.html#klienty-na-vsyu-zhizn">
+          <img
+              class="card__img"
+              src="img/books/${uri}.jpg"
+              width="148"
+              height="208"
+              alt="${name}"
+          />
+          <h2 class="card__title">${name}</h2>
+          <p class="card__price">${price} ₽</p>
+        </a>
+        <button class="btn btn--sm card__buy" data-id="${uri}" data-add-cart>
+          <svg class="btn__icon" width="14" height="14">
+              <use xlink:href="#plus"></use>
+          </svg>
+          <span>В корзину</span>
+        </button>
+      </article>
+    `;
+  }
+
   render() {
     let catalogList = "";
-    books.forEach(({
-      name,
-      desc,
-      price,
-      uri,
-      type
-    }) => {
-      catalogList += `
-                <article class="card" data-id="${uri}">
-                    <a class="card__inner" href="index.html#klienty-na-vsyu-zhizn">
-                    <img
-                        class="card__img"
-                        src="img/books/${uri}.jpg"
-                        width="148"
-                        height="208"
-                        alt="${name}"
-                    />
-                    <h2 class="card__title">${name}</h2>
-                    <p class="card__price">${price} ₽</p>
-                    </a>
-                    <button class="btn btn--sm card__buy" data-id="${uri}">
-                        <svg class="btn__icon" width="14" height="14">
-                            <use xlink:href="#plus"></use>
-                        </svg>
-                    <span>В корзину</span>
-                    </button>
-              </article>
-            `;
+    books.forEach(book => {
+      catalogList += this.renderOne(book);
     });
     this.catalogListBox.innerHTML = catalogList;
   }
 
-} // const catalogListBox = document.querySelector('.catalog__books-list');
-// // // Добавление в корзину
-// const productsStore = localStorageProducts.getProducts();
-// const cartCounter = document.querySelector(".page-header__cart-num");
-// const productsCounter = () => {
-//     cartCounter.innerHTML = productsStore.length;
-// };
-// //   productsCounter();
+  renderSlider() {
+    let sliderList = "";
+    books.forEach(book => {
+      sliderList += `
+            <div class="popular__slide">
+              ${this.renderOne(book)}
+            </div>
+          `;
+    });
+    this.catalogListBox.innerHTML = sliderList;
+  }
 
+}
 
 /* harmony default export */ __webpack_exports__["default"] = (Catalog);
 
@@ -464,30 +715,41 @@ class ModalService {
   init() {
     // слушаем
     // кнопку закрыть
-    // escape
+    const closeModalBookBtn = document.querySelector(".modal__close");
+    closeModalBookBtn.addEventListener("click", () => {
+      this.close();
+    }); // escape
+
     window.addEventListener("keyup", e => {
       if (e.key === "Escape") {
         this.close();
       }
-    });
+    }); // Добавление в корзину
+    // const btnModal = document.querySelector(".btn__sm-text");
+    // console.log(btnModal);
+    // btnModal.addEventListener("click", () => {
+    // const { id } = card.dataset;
+    // this.addProductToCart(id);
+    //   this.close();
+    // });
   }
 
   open(html) {
     if (!html && !html.length) return;
     this.isOpen = true;
     this.renderModal(html);
-    document.querySelector('html').classList.add("js-modal-open");
+    document.documentElement.classList.add("js-modal-open");
     this.modal.classList.add("modal--open");
   }
 
   close() {
     this.isOpen = false;
-    document.querySelector('html').classList.remove("js-modal-open");
+    document.documentElement.classList.remove("js-modal-open");
     this.modal.classList.remove("modal--open");
   }
 
   renderModal(html) {
-    const content = this.modal.querySelector('[data-modal-content]');
+    const content = this.modal.querySelector("[data-modal-content]");
     content.innerHTML = html;
   }
 
@@ -513,61 +775,79 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ __webpack_exports__["default"] = (() => {
-  const catalog = document.querySelector(".catalog__books-list");
-  if (!catalog) return;
-  const cartService = new _components_catalog_CartService__WEBPACK_IMPORTED_MODULE_1__["default"]();
+  const catalogBox = document.querySelector("[data-catalog]");
+  if (!catalogBox) return;
   const modalService = new _components_catalog_ModalService__WEBPACK_IMPORTED_MODULE_2__["default"]();
-  const catalogService = new _components_catalog_Catalog__WEBPACK_IMPORTED_MODULE_0__["default"](cartService, modalService);
-  catalogService.render();
-}); //   Находим куда вывести каталог (все книги), если этого места нет, то ничего не делаем
-// Получить данные каталога
-// Печатаем каталог
-// Навесить слушатели
-//Добавить в корзину
-//Получить данные по количеству в корзину
-//Открытие модалки
-//Получить доп данные для модалки
-// Закрытие модалки
-// Добавить в корзину
-// Удалить из корзины
-// Реализация переключения слайдера
-// Находим куда вывести слайдер (все книги)
-// Получить данные для слайдера
-// Навесить слушатели
-//Добавить в корзину
-//Открытие модалки
-
-/***/ }),
-
-/***/ "./src/components/filter/index.js":
-/*!****************************************!*\
-  !*** ./src/components/filter/index.js ***!
-  \****************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (() => {
-  const filterBox = document.querySelector('.filters'),
-        filterBtn = document.getElementById('filters-trigger');
-  filterBtn.addEventListener('click', () => {
-    filterBox.classList.toggle("filters--open");
-  });
+  const catalog = new _components_catalog_Catalog__WEBPACK_IMPORTED_MODULE_0__["default"]("[data-catalog]", _components_catalog_CartService__WEBPACK_IMPORTED_MODULE_1__["default"], modalService);
+  catalog.render();
+  const slider = new _components_catalog_Catalog__WEBPACK_IMPORTED_MODULE_0__["default"]("[data-popular-slider]", _components_catalog_CartService__WEBPACK_IMPORTED_MODULE_1__["default"], modalService);
+  slider.renderSlider();
+  new _components_catalog_Catalog__WEBPACK_IMPORTED_MODULE_0__["default"]("[data-modal-content]", _components_catalog_CartService__WEBPACK_IMPORTED_MODULE_1__["default"], null);
 });
 
 /***/ }),
 
-/***/ "./src/components/modal.js":
-/*!*********************************!*\
-  !*** ./src/components/modal.js ***!
-  \*********************************/
+/***/ "./src/components/slider/Slider.js":
+/*!*****************************************!*\
+  !*** ./src/components/slider/Slider.js ***!
+  \*****************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (() => {});
+class Slider {
+  constructor(selector) {
+    this.selector = selector;
+  }
+
+  init() {
+    const prev = document.getElementById("popular-slider-left"),
+          next = document.getElementById("popular-slider-right"),
+          slides = document.querySelectorAll(".popular__slide");
+    let index = 1,
+        currentSlideInd = document.getElementById("current-slide-index"),
+        sliderBox = document.querySelector(".popular__slider-box-container"),
+        width = 220,
+        // ширина картинки
+    count = 1,
+        // видимое количество изображений
+    position = 0; // положение ленты прокрутки
+
+    const nextSlide = () => {
+      if (index < slides.length) {
+        // сдвиг вправо
+        position -= width * count; // последнее передвижение вправо может быть не на 3, а на 2 или 1 элемент
+
+        position = Math.max(position, -width * (slides.length - count));
+        sliderBox.style.marginLeft = position + "px";
+        index++;
+      }
+    };
+
+    const prevSlide = () => {
+      if (index > 1) {
+        // сдвиг влево
+        position += width * count; // последнее передвижение влево может быть не на 3, а на 2 или 1 элемент
+
+        position = Math.min(position, 220);
+        sliderBox.style.marginLeft = position + "px";
+        index--;
+      }
+    };
+
+    if (next) {
+      next.addEventListener("click", nextSlide);
+    }
+
+    if (prev) {
+      prev.addEventListener("click", prevSlide);
+    }
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Slider);
 
 /***/ }),
 
@@ -580,129 +860,11 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _components_slider_runSlider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/slider/runSlider */ "./src/components/slider/runSlider.js");
-/* harmony import */ var _components_slider_printSliderList__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/components/slider/printSliderList */ "./src/components/slider/printSliderList.js");
-
+/* harmony import */ var _components_slider_Slider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/slider/Slider */ "./src/components/slider/Slider.js");
 
 /* harmony default export */ __webpack_exports__["default"] = (() => {
-  Object(_components_slider_printSliderList__WEBPACK_IMPORTED_MODULE_1__["default"])();
-  Object(_components_slider_runSlider__WEBPACK_IMPORTED_MODULE_0__["default"])();
-});
-
-/***/ }),
-
-/***/ "./src/components/slider/printSliderList.js":
-/*!**************************************************!*\
-  !*** ./src/components/slider/printSliderList.js ***!
-  \**************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (printSlider => {
-  const sliderListBox = document.querySelector('.popular__slider-box-container');
-
-  class SliderProducts {
-    // handleSetLocalStorage(element, name) {
-    //     const result = localStorageProducts.putProducts(name);
-    //     productsCounter();
-    // }
-    render() {
-      let sliderList = '';
-      books.forEach(({
-        name,
-        desc,
-        price,
-        uri,
-        type
-      }) => {
-        sliderList += `
-
-            <div class="popular__slide">
-                    <article class="card">
-                      <a
-                        class="card__inner"
-                        href="index.html#${uri}"
-                      >
-                        <img
-                          class="card__img"
-                          src="img/books/${uri}.jpg"
-                          width="148"
-                          height="208"
-                          alt="${name}"
-                        />
-                        <h2 class="card__title">${name}</h2>
-                        <p class="card__price">${price} ₽</p>
-                      </a>
-                      <button class="btn  btn--sm card__buy">
-                        <svg class="btn__icon" width="14" height="14">
-                          <use xlink:href="#plus"></use>
-                        </svg>
-                        <span>В корзину</span>
-                      </button>
-                    </article>
-                  </div>
-            `;
-      });
-      sliderListBox.innerHTML = sliderList;
-    }
-
-  }
-
-  const productsPageSlider = new SliderProducts();
-  productsPageSlider.render();
-});
-
-/***/ }),
-
-/***/ "./src/components/slider/runSlider.js":
-/*!********************************************!*\
-  !*** ./src/components/slider/runSlider.js ***!
-  \********************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (swiperSlider => {
-  const prev = document.getElementById('popular-slider-left'),
-        next = document.getElementById('popular-slider-right'),
-        slides = document.querySelectorAll('.popular__slide');
-  let index = 1,
-      currentSlideInd = document.getElementById('current-slide-index'),
-      sliderBox = document.querySelector('.popular__slider-box-container'),
-      width = 220,
-      // ширина картинки
-  count = 1,
-      // видимое количество изображений
-  position = 0; // положение ленты прокрутки
-  // 
-
-  const nextSlide = () => {
-    if (index < slides.length) {
-      // сдвиг вправо
-      position -= width * count; // последнее передвижение вправо может быть не на 3, а на 2 или 1 элемент
-
-      position = Math.max(position, -width * (slides.length - count));
-      sliderBox.style.marginLeft = position + 'px';
-      index++;
-    }
-  };
-
-  const prevSlide = () => {
-    if (index > 1) {
-      // сдвиг влево
-      position += width * count; // последнее передвижение влево может быть не на 3, а на 2 или 1 элемент
-
-      position = Math.min(position, 220);
-      sliderBox.style.marginLeft = position + 'px';
-      index--;
-    }
-  };
-
-  next.addEventListener('click', nextSlide);
-  prev.addEventListener('click', prevSlide);
+  const slider = new _components_slider_Slider__WEBPACK_IMPORTED_MODULE_0__["default"]();
+  slider.init();
 });
 
 /***/ })

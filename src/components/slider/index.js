@@ -1,9 +1,7 @@
-import runSlider from "@/components/slider/runSlider";
-import printSlider from "@/components/slider/printSliderList";
-
-
+import Slider from "@/components/slider/Slider";
 
 export default () => {
-    printSlider();
-    runSlider();
+
+    const slider = new Slider();
+    slider.init();
 };

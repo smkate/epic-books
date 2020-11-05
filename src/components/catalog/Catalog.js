@@ -1,77 +1,39 @@
 class Catalog {
-  constructor(
-    cartService,
-    modalService
-  ) {
+  constructor(selector, cartService, modalService) {
     this.cartService = cartService;
     this.modalService = modalService;
-    this.catalogListBox = document.querySelector(".catalog__books-list");
+    
+    this.catalogListBox = document.querySelector(selector);
 
     this.init();
-    this.inited = false;
   }
-
-  // handleSetLocalStorage(element, name) {
-  //     const result = localStorageProducts.putProducts(name);
-  //     productsCounter();
-  // }
-
-  // const printCatalogItems = () => {
-  //     // Item acticle
-  //     const itemArticle = document.createElement("article");
-  //     itemArticle.classList.add("card");
-  //     // Item link
-  //     const itemLink = document.createElement("a");
-  //     itemArticle.classList.add("card__inner");
-  //     itemArticle.classList.add("card");
-  //     // Item img
-  //     const itemImage = document.createElement("img");
-  //     completedButton.innerHTML = '<img
-  //     class="card__img"
-  //     src="img/books/${uri}.jpg"
-  //     width="148"
-  //     height="208"
-  //     alt="${name}"
-  // />';
-  // }
 
   init() {
-    if (!this.inited) {
-      // Навесить слушатели на каталог
-      this.catalogListBox.addEventListener("click", (e) => {
-        e.preventDefault();
-        
+    // Навесить слушатели на каталог
+    this.catalogListBox.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      // Открытие модального окна
+      if (e.target.closest(".card .card__inner")) {
         const card = e.target.closest(".card");
-        
-        // Открытие модального окна
-        if (e.target.closest(".card .card__inner")) {
-          const { id } = card.dataset;
-          const book = this.findBook(id);
-          const htmlBook = this.renderHtmlForModal(book);
-          this.modalService.open(htmlBook);
-        }
-        
-        // Добавление в корзину
-        if (e.target.closest(".card .card__buy")) {
-          const { id } = card.dataset;
-          this.addProductToCart(id);
-        }
-      });
-    }
+        const { id } = card.dataset;
+        const book = this.findBook(id);
 
-    this.inited = true;
-  }
+        const htmlBook = this.renderHtmlForModal(book);
+        this.modalService.open(htmlBook);
+      }
 
-  findBook(id) {
-    const index = books.findIndex(item => {
-      return item.uri === id;
+      // Добавление в корзину
+      if (e.target.closest("[data-add-cart]")) {
+        const item = e.target.closest("[data-add-cart]")
+        const { id } = item.dataset;
+        this.addProductToCart(id);    
+      }
     });
-
-    return books[index];
   }
 
-  openModal() {}
   
+
   addProductToCart(id) {
     this.cartService.putProducts(id);
   }
@@ -114,16 +76,16 @@ class Catalog {
                     <tr>
                       <th>Автор:</th>
                       <td>
-                        <a href="">Девид Огилви</a>
+                        <a href="">${product.author}</a>
                       </td>
                     </tr>
                     <tr>
                       <th>Артикул:</th>
-                      <td>6649507</td>
+                      <td>${product.article}</td>
                     </tr>
                     <tr>
                       <th>В наличии:</th>
-                      <td>5 шт.</td>
+                      <td>${product.store} шт.</td>
                     </tr>
                   </table>
                 </div>
@@ -133,7 +95,7 @@ class Catalog {
                   ${product.desc}
                   </p>
                   <div class="product__actions">
-                    <button class="btn  btn--price">
+                    <button class="btn  btn--price" data-id="${product.uri}" data-add-cart>
                       ${product.price} ₽
                       <span class="btn__sm-text">
                         <svg class="btn__icon" width="14" height="14">
@@ -146,47 +108,55 @@ class Catalog {
                 </div>
               </div>
     `;
-  
+  }
+
+  renderOne({ name, price, uri }) {
+    return `
+      <article class="card" data-id="${uri}">
+        <a class="card__inner" href="index.html#klienty-na-vsyu-zhizn">
+          <img
+              class="card__img"
+              src="img/books/${uri}.jpg"
+              width="148"
+              height="208"
+              alt="${name}"
+          />
+          <h2 class="card__title">${name}</h2>
+          <p class="card__price">${price} ₽</p>
+        </a>
+        <button class="btn btn--sm card__buy" data-id="${uri}" data-add-cart>
+          <svg class="btn__icon" width="14" height="14">
+              <use xlink:href="#plus"></use>
+          </svg>
+          <span>В корзину</span>
+        </button>
+      </article>
+    `;
   }
 
   render() {
     let catalogList = "";
 
-    books.forEach(({ name, desc, price, uri, type }) => {
-      catalogList += `
-                <article class="card" data-id="${uri}">
-                    <a class="card__inner" href="index.html#klienty-na-vsyu-zhizn">
-                    <img
-                        class="card__img"
-                        src="img/books/${uri}.jpg"
-                        width="148"
-                        height="208"
-                        alt="${name}"
-                    />
-                    <h2 class="card__title">${name}</h2>
-                    <p class="card__price">${price} ₽</p>
-                    </a>
-                    <button class="btn btn--sm card__buy" data-id="${uri}">
-                        <svg class="btn__icon" width="14" height="14">
-                            <use xlink:href="#plus"></use>
-                        </svg>
-                    <span>В корзину</span>
-                    </button>
-              </article>
-            `;
-    });
+    books.forEach((book) => {
+        catalogList += this.renderOne(book);
+      });
 
     this.catalogListBox.innerHTML = catalogList;
   }
-}
 
-// const catalogListBox = document.querySelector('.catalog__books-list');
-// // // Добавление в корзину
-// const productsStore = localStorageProducts.getProducts();
-// const cartCounter = document.querySelector(".page-header__cart-num");
-// const productsCounter = () => {
-//     cartCounter.innerHTML = productsStore.length;
-// };
-// //   productsCounter();
+  renderSlider() {
+    let sliderList = "";
+
+    books.forEach((book) => {
+      sliderList += `
+            <div class="popular__slide">
+              ${this.renderOne(book)}
+            </div>
+          `;
+    });
+
+    this.catalogListBox.innerHTML = sliderList;
+  }
+}
 
 export default Catalog;

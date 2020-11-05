@@ -3,22 +3,25 @@
 <!-- Для показа мод. окна дописать на html класс js-modal-open и дописать на нужное мод. окно класс modal--open-->
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="format-detection" content="date=no">
-    <meta name="format-detection" content="address=no">
-    <meta name="format-detection" content="email=no">
-    <meta content="notranslate" name="google">
-    <meta name="theme-color" content="#000">
-    <meta name="msapplication-navbutton-color" content="#000">
-    <meta name="apple-mobile-web-app-status-bar-style" content="#000">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="format-detection" content="date=no" />
+    <meta name="format-detection" content="address=no" />
+    <meta name="format-detection" content="email=no" />
+    <meta content="notranslate" name="google" />
+    <meta name="theme-color" content="#000" />
+    <meta name="msapplication-navbutton-color" content="#000" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="#000" />
     <title>Корзина</title>
-    <meta name="description" content="">
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="css/style.css" />
     <script>
-        document.querySelector('html').classList.replace('no-js', 'js');
-        'ontouchstart' in window ? document.querySelector('html').classList.add('touch') : document.querySelector('html').classList.add('no-touch');
+        document.querySelector("html").classList.replace("no-js", "js");
+        "ontouchstart" in window
+            ?
+            document.querySelector("html").classList.add("touch") :
+            document.querySelector("html").classList.add("no-touch");
     </script>
 </head>
 
@@ -138,76 +141,12 @@
                 <form class="form cart__inner">
                     <header class="cart__header">
                         <h1 class="cart__title">В корзине 99992 товара</h1>
-                        <button class="btn  btn--text cart__clear-btn" type="button">Очистить корзину</button>
+                        <button class="btn  btn--text cart__clear-btn" type="button">
+                            Очистить корзину
+                        </button>
                     </header>
-                    <table class="cart__table">
-                        <tr class="cart__table-headers">
-                            <th class="cart__col-1"></th>
-                            <th class="cart__col-2">Товар</th>
-                            <th class="cart__col-3">Кол-во</th>
-                            <th class="cart__col-4">Цена</th>
-                            <th class="cart__col-5"></th>
-                        </tr>
-                        <tr class="cart__product">
-                            <td class="cart__col-1">
-                                <img class="cart__item-img" src="img/tsennye-resheniya.jpg" alt="Ценные решения">
-                            </td>
-                            <td class="cart__col-2">
-                                <div class="cart__item-name">Название какие-то очень длинное, совершенно невменяемое для книгоиздателя</div>
-                            </td>
-                            <td class="cart__col-3">
-                                <div class="field-num  field-num--bg-tran">
-                                    <span class="field-num__input-wrap">
-                      <button class="field-num__btn-minus" type="button">-</button>
-                      <input class="field-num__input" type="number" value="2" step="1" min="1"/>
-                      <button class="field-num__btn-plus" type="button">+</button>
-                    </span>
-                                </div>
-                            </td>
-                            <td class="cart__col-4">
-                                <span class="cart__item-price">1 024 ₽</span>
-                            </td>
-                            <td class="cart__col-5">
-                                <button class="close cart__product-del-btn" type="button">
-                                    <svg width="16" height="16">
-                                        <use xlink:href="#close"></use>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="cart__product">
-                            <td class="cart__col-1">
-                                <img class="cart__item-img" src="img/tsennye-resheniya.jpg" alt="Ценные решения">
-                            </td>
-                            <td class="cart__col-2">
-                                <div class="cart__item-name">Название</div>
-                            </td>
-                            <td class="cart__col-3">
-                                <div class="field-num  field-num--bg-tran">
-                                    <span class="field-num__input-wrap">
-                      <button class="field-num__btn-minus" type="button">-</button>
-                      <input class="field-num__input" type="number" value="1" step="1" min="1"/>
-                      <button class="field-num__btn-plus" type="button">+</button>
-                    </span>
-                                </div>
-                            </td>
-                            <td class="cart__col-4">
-                                <span class="cart__item-price">999 024 ₽</span>
-                            </td>
-                            <td class="cart__col-5">
-                                <button class="close cart__product-del-btn" type="button">
-                                    <svg width="16" height="16">
-                                        <use xlink:href="#close"></use>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="cart__products-price" colspan="5">
-                                Итого к оплате: <strong class="cart__products-price-num" id="cart-products-price-num">2 200 ₽</strong>
-                            </td>
-                        </tr>
-                    </table>
+                    <table class="cart__table" data-cart-content></table>
+
                     <div class="cart__checkout checkout">
                         <h2 class="checkout__title">Оформление заказа</h2>
                         <fieldset class="form__fieldset">
@@ -216,25 +155,45 @@
                                 <label class="field-text  field-text--bg-gray">
                                     <span class="field-text__name">Имя</span>
                                     <span class="field-text__input-wrap">
-                      <input class="field-text__input" type="text" name="firstname" placeholder="Иван"/>
+                      <input
+                        class="field-text__input"
+                        type="text"
+                        name="firstname"
+                        placeholder="Иван"
+                      />
                     </span>
                                 </label>
                                 <label class="field-text  field-text--bg-gray">
                                     <span class="field-text__name">Фамилия</span>
                                     <span class="field-text__input-wrap">
-                      <input class="field-text__input" type="text" name="lastname" placeholder="Помидоров"/>
+                      <input
+                        class="field-text__input"
+                        type="text"
+                        name="lastname"
+                        placeholder="Помидоров"
+                      />
                     </span>
                                 </label>
                                 <label class="field-text  field-text--bg-gray">
                                     <span class="field-text__name">Телефон</span>
                                     <span class="field-text__input-wrap">
-                      <input class="field-text__input" type="tel" name="phone" placeholder="+7 812 000 00 00"/>
+                      <input
+                        class="field-text__input"
+                        type="tel"
+                        name="phone"
+                        placeholder="+7 812 000 00 00"
+                      />
                     </span>
                                 </label>
                                 <label class="field-text  field-text--bg-gray">
                                     <span class="field-text__name">E-mail</span>
                                     <span class="field-text__input-wrap">
-                      <input class="field-text__input" type="email" name="name" placeholder="user@mail.com"/>
+                      <input
+                        class="field-text__input"
+                        type="email"
+                        name="name"
+                        placeholder="user@mail.com"
+                      />
                     </span>
                                 </label>
                             </div>
@@ -252,13 +211,15 @@
                                 <div class="field-radio__input-wrap">
                                     <label class="field-radio__name">
                                         <input class="field-radio__input" type="radio" name="delivery" value="2" />
-                                        <span class="field-radio__name-text">Доставка курьером</span>
+                                        <span class="field-radio__name-text"
+                        >Доставка курьером</span>
                                     </label>
                                 </div>
                                 <div class="field-radio__input-wrap">
                                     <label class="field-radio__name">
                                         <input class="field-radio__input" type="radio" name="delivery" value="3" />
-                                        <span class="field-radio__name-text">Доставка почтой</span>
+                                        <span class="field-radio__name-text"
+                        >Доставка почтой</span>
                                     </label>
                                 </div>
                             </div>
@@ -267,7 +228,9 @@
                                     <div class="field-select__name">Пункты самовывоза</div>
                                     <div class="field-select__select-wrap">
                                         <select class="field-select__select" name="pickup-points">
-                                            <option value="1">Малая каштановая аллея, 9 , м. Площадь Александра Невского-2 </option>
+                                            <option value="1">Малая каштановая аллея, 9 , м. Площадь Александра
+                                                Невского-2
+                                            </option>
                                             <option value="2">ул. конунга Ульянова, 18/49, м. Петроградская</option>
                                             <option value="3">Кронверкский проспект, 23, м. Горьковская</option>
                                         </select>
@@ -291,11 +254,17 @@
                                         <label class="field-text  field-text--bg-gray">
                                             <span class="field-text__name">Адрес доставки</span>
                                             <span class="field-text__input-wrap">
-                          <input class="field-text__input" type="text" name="delivery-address"/>
+                          <input
+                            class="field-text__input"
+                            type="text"
+                            name="delivery-address"
+                          />
                         </span>
                                         </label>
                                         <div class="field-select-group">
-                                            <div class="field-select-group__name">Дата и время доставки</div>
+                                            <div class="field-select-group__name">
+                                                Дата и время доставки
+                                            </div>
                                             <div class="field-select-group__wrap">
                                                 <div class="field-select">
                                                     <div class="field-select__select-wrap">
@@ -321,22 +290,33 @@
                                         <label class="field-text  field-text--bg-gray cart__delivery-comment">
                                             <span class="field-text__name">Комментарий</span>
                                             <span class="field-text__input-wrap">
-                          <textarea class="field-text__input" name="delivery-address-comment" placeholder="Укажите подробности заказа"></textarea>
+                          <textarea
+                            class="field-text__input"
+                            name="delivery-address-comment"
+                            placeholder="Укажите подробности заказа"
+                          ></textarea>
                         </span>
                                         </label>
                                     </div>
                                     <p class="cart__courier-data-left">
-                                        Доставка курьером на <span class="cart__delivery-date" id="delivery-date">13 января 2020</span>
-                                        <br>
+                                        Доставка курьером на
+                                        <span class="cart__delivery-date" id="delivery-date"
+                        >13 января 2020</span>
+                                        <br />
                                         <strong class="cart__delivery-price">200 ₽</strong>
                                     </p>
                                 </div>
                             </div>
                             <div class="cart__delivery cart__delivery--hidden" id="cart-delivery-3">
                                 <label class="field-text  field-text--bg-gray">
-                                    <span class="field-text__name">Адрес для доставки почтой</span>
+                                    <span class="field-text__name"
+                      >Адрес для доставки почтой</span>
                                     <span class="field-text__input-wrap">
-                      <input class="field-text__input" type="text" name="post-address"/>
+                      <input
+                        class="field-text__input"
+                        type="text"
+                        name="post-address"
+                      />
                     </span>
                                 </label>
                             </div>
@@ -348,19 +328,22 @@
                                 <div class="field-radio__input-wrap">
                                     <label class="field-radio__name">
                                         <input class="field-radio__input" type="radio" name="paying" value="1" checked="checked" />
-                                        <span class="field-radio__name-text">Банковской картой</span>
+                                        <span class="field-radio__name-text"
+                        >Банковской картой</span>
                                     </label>
                                 </div>
                                 <div class="field-radio__input-wrap">
                                     <label class="field-radio__name">
                                         <input class="field-radio__input" type="radio" name="paying" value="2" />
-                                        <span class="field-radio__name-text">Наличными курьеру</span>
+                                        <span class="field-radio__name-text"
+                        >Наличными курьеру</span>
                                     </label>
                                 </div>
                                 <div class="field-radio__input-wrap">
                                     <label class="field-radio__name">
                                         <input class="field-radio__input" type="radio" name="paying" value="3" />
-                                        <span class="field-radio__name-text">Банковский перевод</span>
+                                        <span class="field-radio__name-text"
+                        >Банковский перевод</span>
                                     </label>
                                 </div>
                             </div>
@@ -368,20 +351,31 @@
                             <label class="field-text  field-text--bg-gray field-text--promocode field-text--input-checked cart__promocode">
                                 <span class="field-text__name">Промокод</span>
                                 <span class="field-text__input-wrap">
-                    <input class="field-text__input" type="text" value="CORRECT_CODE" name="promocode"/>
+                    <input
+                      class="field-text__input"
+                      type="text"
+                      value="CORRECT_CODE"
+                      name="promocode"
+                    />
                   </span>
                             </label>
                             <p class="checkout__discount">
-                                Скидка: <strong class="checkout__discount-num" id="checkout-discount-num">- 150 ₽</strong>
+                                Скидка:
+                                <strong
+                    class="checkout__discount-num"
+                    id="checkout-discount-num"
+                    >- 150 ₽</strong>
                             </p>
                         </fieldset>
                         <div class="field-actions">
                             <p class="checkout__all-price">
-                                Итого к оплате: <strong class="checkout__price">2 200 ₽</strong>
+                                Итого к оплате:
+                                <strong class="checkout__price">2 200 ₽</strong>
                             </p>
                             <button class="btn  btn--shadow">Оплатить</button>
                             <p class="checkout__conditions">
-                                Нажимая на кнопку, вы принимаете условия <a href="#">Публичной оферты</a>
+                                Нажимая на кнопку, вы принимаете условия
+                                <a href="#">Публичной оферты</a>
                             </p>
                         </div>
                     </div>
@@ -428,13 +422,16 @@
                             <a href="#">Контакты</a>
                         </li>
                     </ul>
-                    <p class="page-footer__copyright">© EpicSkills. 2019. Все права защищены</p>
+                    <p class="page-footer__copyright">
+                        © EpicSkills. 2019. Все права защищены
+                    </p>
                 </div>
             </footer>
         </div>
     </div>
     <script src="js/choices.min.js"></script>
     <script src="js/nouislider.min.js"></script>
+    <script src="js/data.js"></script>
     <script src="scripts/app.js"></script>
     <div class="modal__backdrop"></div>
 </body>

@@ -11,6 +11,10 @@ class ModalService {
   init() {
     // слушаем
     // кнопку закрыть
+    const closeModalBookBtn = document.querySelector(".modal__close");
+    closeModalBookBtn.addEventListener("click", () => {
+      this.close();
+    });
 
     // escape
     window.addEventListener("keyup", (e) => {
@@ -18,6 +22,15 @@ class ModalService {
         this.close();
       }
     });
+
+    // Добавление в корзину
+    // const btnModal = document.querySelector(".btn__sm-text");
+    // console.log(btnModal);
+    // btnModal.addEventListener("click", () => {
+    // const { id } = card.dataset;
+    // this.addProductToCart(id);
+    //   this.close();
+    // });
   }
 
   open(html) {
@@ -25,20 +38,20 @@ class ModalService {
 
     this.isOpen = true;
     this.renderModal(html);
-    document.querySelector('html').classList.add("js-modal-open");
+    document.documentElement.classList.add("js-modal-open");
     this.modal.classList.add("modal--open");
   }
 
   close() {
     this.isOpen = false;
-    document.querySelector('html').classList.remove("js-modal-open");
+    document.documentElement.classList.remove("js-modal-open");
     this.modal.classList.remove("modal--open");
   }
 
   renderModal(html) {
-    const content = this.modal.querySelector('[data-modal-content]');
+    const content = this.modal.querySelector("[data-modal-content]");
     content.innerHTML = html;
   }
 }
 
-export default ModalService
+export default ModalService;
