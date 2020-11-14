@@ -198,6 +198,32 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./src/assets/scripts/utils/utils.js":
+/*!*******************************************!*\
+  !*** ./src/assets/scripts/utils/utils.js ***!
+  \*******************************************/
+/*! exports provided: toRub, declOfNum */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toRub", function() { return toRub; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "declOfNum", function() { return declOfNum; });
+const toRub = value => {
+  if (value < 10000) {
+    return `${value}&thinsp;₽`;
+  } else {
+    return `${value.toLocaleString("ru-RU")}&thinsp;₽`;
+  }
+};
+const declOfNum = (count, titles) => {
+  const cases = [2, 0, 1, 1, 1, 2];
+  const word = titles[count % 100 > 4 && count % 100 < 20 ? 2 : cases[count % 10 < 5 ? count % 10 : 5]];
+  return `${count}&nbsp;${word}`;
+};
+
+/***/ }),
+
 /***/ "./src/components/ApiService.js":
 /*!**************************************!*\
   !*** ./src/components/ApiService.js ***!
@@ -208,7 +234,8 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 class ApiService {
-  constructor() {}
+  constructor() {// this.findBook(id);
+  }
 
   findBook(id) {
     const index = books.findIndex(item => {
@@ -217,9 +244,20 @@ class ApiService {
     return books[index];
   }
 
+  getBookStore(id) {
+    const book = this.findBook(id);
+
+    if (book) {
+      return book.store;
+    }
+
+    return 0;
+  }
+
 }
 
-/* harmony default export */ __webpack_exports__["default"] = (ApiService);
+const apiService = new ApiService();
+/* harmony default export */ __webpack_exports__["default"] = (apiService);
 
 /***/ }),
 
@@ -232,14 +270,15 @@ class ApiService {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _ApiService__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../ApiService */ "./src/components/ApiService.js");
+/* harmony import */ var _utils_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @utils/utils */ "./src/assets/scripts/utils/utils.js");
 
 
 class Cart {
-  constructor(cartService) {
+  constructor(cartService, apiService) {
     this.cartService = cartService;
     this.cartBox = document.querySelector("[data-cart-content]");
-    this.api = new _ApiService__WEBPACK_IMPORTED_MODULE_0__["default"]();
+    this.cartCount = document.querySelector("[data-cart-count]");
+    this.api = apiService;
 
     if (this.cartBox) {
       this.renderCart();
@@ -250,35 +289,83 @@ class Cart {
   init() {
     // this.cartBox.addEventListener('click', (e) => {
     // const {target} = e;
-    this.cartBox.addEventListener('click', ({
+    this.cartBox.addEventListener("click", ({
       target
     }) => {
-      if (target.closest('[data-plus]')) {
+      // const amount = this.cartService.getCartLength();
+      if (target.closest("[data-plus]")) {
         const id = target.dataset.plus;
-        this.cartService.putProducts(id); // this.updateRow();
-        // refreshCount
+        this.cartService.putProducts(id);
+        this.updateRow(id);
+        this.refreshCart();
       }
 
-      if (target.closest('[data-minus]')) {
+      if (target.closest("[data-minus]")) {
         const id = target.dataset.minus;
-        this.cartService.removeProducts(id); // removeAllProducts
-        // this.updateRow();
-        // refreshCount
+        this.cartService.removeProducts(id);
+        this.updateRow(id);
+        this.refreshCart();
       }
 
-      if (target.closest('[data-delete]')) {
+      if (target.closest("[data-delete]")) {
         const id = target.dataset.delete;
-        this.cartService.deleteProduct(id); // refreshCount
+        this.cartService.deleteProduct(id);
+        this.renderCart();
       }
     }); // TODO обработчик ввода
     // обновление количества в поле ввода
-    // Пересчет суммы корзины 
-    // вывод количстве элементов this.cartService.getCartLength();
-    // во все деньги добавить разряды от 10 000 // 9999 // 99 9999 // 8888
+    // Пересчет суммы корзины
+
+    this.cartBox.addEventListener("click", ({
+      target
+    }) => {
+      const input = target.closest("[data-product-count]");
+
+      if (input) {
+        const id = input.dataset.productCount;
+        this.cartService.addProduct(id, input.value);
+        this.updateRow(id);
+        this.refreshCart();
+      }
+    });
+    const removeAllBtn = document.querySelector("[data-remove-cart]");
+    removeAllBtn.addEventListener("click", ({
+      target
+    }) => {
+      // очистка корзины
+      if (target.closest("[data-remove-cart]")) {
+        this.cartService.removeAllProducts();
+        this.renderCart();
+      }
+    });
   }
 
-  refreshCount() {// Товар, товара, товаров // pieces
-    // title.innerHTML = `В корзине ${this.cartService.getCartLength()} ${pieces()}`;
+  refreshCart() {
+    this.refreshCount();
+    this.refreshTotalSum();
+  }
+
+  refreshCount() {
+    const count = this.cartService.getCartLength();
+    this.cartCount.innerHTML = `В корзине ${Object(_utils_utils__WEBPACK_IMPORTED_MODULE_0__["declOfNum"])(count, ["товар", "товара", "товаров"])}`;
+  }
+
+  refreshTotalSum() {
+    const cartTotalSum = document.querySelector("#cart-products-price-num");
+    const totalSum = this.cartService.getTotalSum();
+    cartTotalSum.innerHTML = totalSum;
+  }
+
+  updateRow(id) {
+    const row = document.querySelector(`[data-id="${id}"]`); // Обновление количества
+
+    const input = row.querySelector("[data-product-count]");
+    const book = this.cartService.getProduct(id);
+    input.value = book.amount; // обновление суммы
+
+    const sumBox = row.querySelector("[data-price]");
+    const sum = this.cartService.getProductSum(id);
+    sumBox.innerHTML = sum;
   }
 
   renderCart(html) {
@@ -306,8 +393,9 @@ class Cart {
       cartContent += this.renderHtmlForCart({ ...book,
         amount
       });
-    });
-    const totalPrice = "2 220000";
+    }); // выводим сумму корзины
+
+    const totalPrice = this.cartService.getTotalSum();
     cartContent += `
       <tr>
         <td class="cart__products-price" colspan="5">
@@ -315,12 +403,13 @@ class Cart {
           <strong
             class="cart__products-price-num"
             id="cart-products-price-num"
-            >${totalPrice} ₽</strong
+            >${totalPrice}</strong
           >
         </td>
       </tr>
     `;
     this.cartBox.innerHTML = cartContent;
+    this.refreshCart();
   }
 
   renderHtmlForCart({
@@ -330,9 +419,9 @@ class Cart {
     amount
   }) {
     return `
-          <tr class="cart__product">
+          <tr class="cart__product" data-id="${uri}">
             <td class="cart__col-1">
-              <img class="cart__item-img" src="img/books/${uri}.jpg" alt="${uri}">
+              <img class="cart__item-img" src="img/books/${uri}.jpg" alt="${name}">
               </td>
                 <td class="cart__col-2">
                 <div class="cart__item-name">${name}</div>
@@ -342,14 +431,14 @@ class Cart {
                 <div class="field-num  field-num--bg-tran">
                     <span class="field-num__input-wrap">
                       <button class="field-num__btn-minus" data-minus="${uri}" type="button">-</button>
-                      <input class="field-num__input" type="number" value="${amount}" step="1" min="1"/>
+                      <input data-product-count="${uri}" class="field-num__input" type="number" value="${amount}" step="1" min="1"/>
                       <button class="field-num__btn-plus" data-plus="${uri}" type="button">+</button>
                     </span>
                 </div>
               </td>
 
               <td class="cart__col-4">
-                <span class="cart__item-price">${amount * price} ₽</span>
+                <span class="cart__item-price" data-price>${amount * price} ₽</span>
               </td>
 
               <td class="cart__col-5">
@@ -380,33 +469,17 @@ class Cart {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_cart_Cart__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/cart/Cart */ "./src/components/cart/Cart.js");
 /* harmony import */ var _components_catalog_CartService__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/components/catalog/CartService */ "./src/components/catalog/CartService.js");
+/* harmony import */ var _ApiService__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../ApiService */ "./src/components/ApiService.js");
+
 
 
 /* harmony default export */ __webpack_exports__["default"] = (() => {
   const cartBox = document.querySelector(".cart__table");
   if (!cartBox) return;
-  const cart = new _components_cart_Cart__WEBPACK_IMPORTED_MODULE_0__["default"](_components_catalog_CartService__WEBPACK_IMPORTED_MODULE_1__["default"]); // cart.render(); 
-}); // Находим куда вывести корзину, если этого места нет, то ничего не делаем
-// Получить данные корзины
-// Печатаем корзину
-// Навесить слушатели
-// // Очистка корзины
-// // // Затираем массив
-// // Поменять количество в строке
-// // Удалять элементы из корзины
-// const cart = [];
+  const cart = new _components_cart_Cart__WEBPACK_IMPORTED_MODULE_0__["default"](_components_catalog_CartService__WEBPACK_IMPORTED_MODULE_1__["default"], _ApiService__WEBPACK_IMPORTED_MODULE_2__["default"]); // cart.render();
+}); // const cart = [];
 // renderCard(cartList); // [{name: 'Books'}]
 // addToCart(bookItem); //
-// 1. Вывод состояния корзины на страницу
-// 2. Метод добавления товара в корзину
-// 3. Метод удаления товара из корзины
-// 4. Метод удаления всех товаров из корзины
-// 5. Метод изменения количества в плюс
-// 6. Метод изменения количества в минус
-// 7. Метод ввода значения руками
-// 8. Метод вывода количества товаров на иконку Корзины
-// 9. Метод вывода количества элементов
-// 10. Метод вывода суммы корзины
 
 /***/ }),
 
@@ -419,11 +492,18 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _utils_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @utils/utils */ "./src/assets/scripts/utils/utils.js");
+/* harmony import */ var _ApiService__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../ApiService */ "./src/components/ApiService.js");
+
+
+
 class CartService {
   constructor() {
+    this.api = _ApiService__WEBPACK_IMPORTED_MODULE_1__["default"];
     this.keyName = "cart";
     this.cart = this.getProducts();
     this.cartWidget = document.querySelector(".page-header__cart-num");
+    this.cartOneCount = document.querySelector(["data-product-count"]);
     this.updateCartWidget();
   }
 
@@ -433,16 +513,35 @@ class CartService {
     return JSON.parse(productsLocalStorage);
   }
 
+  getProduct(id) {
+    if (!id && !id.length) return;
+    const products = this.getProducts();
+    const index = products.findIndex(item => {
+      return item.id === id;
+    });
+    return products[index];
+  }
+
+  getProductSum(id) {
+    const product = this.getProduct(id);
+    const book = this.api.getBookStore(id);
+    return product.amount * book.price;
+  }
+
   putProducts(id) {
     if (!id && !id.length) return;
     const products = this.getProducts();
     const index = products.findIndex(item => {
       return item.id === id;
     });
+    ;
 
     if (index !== -1) {
-      const amount = products[index].amount;
-      products[index].amount = amount + 1;
+      const store = this.api.getBookStore(products[index].id);
+
+      if (products[index].amount < parseInt(store, 10)) {
+        products[index].amount += 1;
+      }
     } else {
       products.push({
         id,
@@ -450,8 +549,24 @@ class CartService {
       });
     }
 
-    this.updateCartWidget();
     localStorage.setItem(this.keyName, JSON.stringify(products));
+    this.updateCartWidget();
+  }
+
+  addProduct(id, count) {
+    if (!id && !id.length) return;
+    const products = this.getProducts();
+    const index = products.findIndex(item => {
+      return item.id === id;
+    });
+    const store = this.api.getBookStore(products[index].id);
+
+    if (index !== -1 && products[index].amount < store) {
+      products[index].amount = count;
+    }
+
+    localStorage.setItem(this.keyName, JSON.stringify(products));
+    this.updateCartWidget();
   }
 
   removeProducts(id) {
@@ -462,17 +577,15 @@ class CartService {
     });
 
     if (index !== -1) {
-      const amount = products[index].amount;
-
-      if (amount > 1) {
-        products[index].amount = amount - 1;
+      if (products[index].amount > 1) {
+        products[index].amount -= 1;
       } else {
         this.deleteProduct(id);
       }
     }
 
-    this.updateCartWidget();
     localStorage.setItem(this.keyName, JSON.stringify(products));
+    this.updateCartWidget();
   }
 
   deleteProduct(id) {
@@ -486,17 +599,12 @@ class CartService {
       products.splice(index, 1);
     }
 
-    this.updateCartWidget();
     localStorage.setItem(this.keyName, JSON.stringify(products));
+    this.updateCartWidget();
   }
 
   removeAllProducts() {
-    const books = this.getProducts();
-    books.forEach(({
-      id
-    }) => {
-      this.deleteProduct(id);
-    });
+    localStorage.setItem(this.keyName, JSON.stringify([]));
     this.updateCartWidget();
   }
 
@@ -515,6 +623,18 @@ class CartService {
 
   getPromotionSum() {}
 
+  getTotalSum() {
+    const cart = this.getProducts(); // [id, amount]
+
+    let sum = 0;
+    cart.forEach(item => {
+      const book = this.api.findBook(item.id);
+      sum += book.price * item.amount;
+      console.log(sum);
+    });
+    return Object(_utils_utils__WEBPACK_IMPORTED_MODULE_0__["toRub"])(sum);
+  }
+
 }
 
 const cartService = new CartService();
@@ -531,10 +651,14 @@ const cartService = new CartService();
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ApiService__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../ApiService */ "./src/components/ApiService.js");
+
+
 class Catalog {
   constructor(selector, cartService, modalService) {
     this.cartService = cartService;
     this.modalService = modalService;
+    this.api = _ApiService__WEBPACK_IMPORTED_MODULE_0__["default"];
     this.catalogListBox = document.querySelector(selector);
     this.init();
   }
@@ -549,7 +673,7 @@ class Catalog {
         const {
           id
         } = card.dataset;
-        const book = this.findBook(id);
+        const book = this.api.findBook(id);
         const htmlBook = this.renderHtmlForModal(book);
         this.modalService.open(htmlBook);
       } // Добавление в корзину
@@ -721,7 +845,7 @@ class ModalService {
     }); // escape
 
     window.addEventListener("keyup", e => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" || !e.target.closest(".modal")) {
         this.close();
       }
     }); // Добавление в корзину

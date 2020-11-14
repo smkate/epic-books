@@ -1,35 +1,16 @@
 import Cart from "@/components/cart/Cart";
 import cartService from "@/components/catalog/CartService";
+import apiService from "../ApiService";
 
 export default () => {
   const cartBox = document.querySelector(".cart__table");
 
   if (!cartBox) return;
 
-  const cart = new Cart(cartService);
-  // cart.render(); 
+  const cart = new Cart(cartService, apiService);
+  // cart.render();
 };
-
-// Находим куда вывести корзину, если этого места нет, то ничего не делаем
-// Получить данные корзины
-// Печатаем корзину
-// Навесить слушатели
-// // Очистка корзины
-// // // Затираем массив
-// // Поменять количество в строке
-// // Удалять элементы из корзины
 
 // const cart = [];
 // renderCard(cartList); // [{name: 'Books'}]
 // addToCart(bookItem); //
-
-// 1. Вывод состояния корзины на страницу
-// 2. Метод добавления товара в корзину
-// 3. Метод удаления товара из корзины
-// 4. Метод удаления всех товаров из корзины
-// 5. Метод изменения количества в плюс
-// 6. Метод изменения количества в минус
-// 7. Метод ввода значения руками
-// 8. Метод вывода количества товаров на иконку Корзины
-// 9. Метод вывода количества элементов
-// 10. Метод вывода суммы корзины

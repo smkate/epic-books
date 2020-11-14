@@ -1,8 +1,11 @@
+import apiService from '../ApiService'
+
 class Catalog {
   constructor(selector, cartService, modalService) {
     this.cartService = cartService;
     this.modalService = modalService;
-    
+    this.api = apiService;
+
     this.catalogListBox = document.querySelector(selector);
 
     this.init();
@@ -17,7 +20,7 @@ class Catalog {
       if (e.target.closest(".card .card__inner")) {
         const card = e.target.closest(".card");
         const { id } = card.dataset;
-        const book = this.findBook(id);
+        const book = this.api.findBook(id);
 
         const htmlBook = this.renderHtmlForModal(book);
         this.modalService.open(htmlBook);
@@ -25,14 +28,12 @@ class Catalog {
 
       // Добавление в корзину
       if (e.target.closest("[data-add-cart]")) {
-        const item = e.target.closest("[data-add-cart]")
+        const item = e.target.closest("[data-add-cart]");
         const { id } = item.dataset;
-        this.addProductToCart(id);    
+        this.addProductToCart(id);
       }
     });
   }
-
-  
 
   addProductToCart(id) {
     this.cartService.putProducts(id);
@@ -138,8 +139,8 @@ class Catalog {
     let catalogList = "";
 
     books.forEach((book) => {
-        catalogList += this.renderOne(book);
-      });
+      catalogList += this.renderOne(book);
+    });
 
     this.catalogListBox.innerHTML = catalogList;
   }

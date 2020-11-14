@@ -1,10 +1,11 @@
-import ApiService from "../ApiService";
+import { declOfNum } from "@utils/utils";
 
 class Cart {
-  constructor(cartService) {
+  constructor(cartService, apiService) {
     this.cartService = cartService;
     this.cartBox = document.querySelector("[data-cart-content]");
-    this.api = new ApiService();
+    this.cartCount = document.querySelector("[data-cart-count]");
+    this.api = apiService;
 
     if (this.cartBox) {
       this.renderCart();
@@ -14,47 +15,96 @@ class Cart {
 
   init() {
     // this.cartBox.addEventListener('click', (e) => {
-      // const {target} = e;
-    this.cartBox.addEventListener('click', ({target}) => {
+    // const {target} = e;
+    this.cartBox.addEventListener("click", ({ target }) => {
+      // const amount = this.cartService.getCartLength();
 
-      if (target.closest('[data-plus]')) {
+      if (target.closest("[data-plus]")) {
         const id = target.dataset.plus;
         this.cartService.putProducts(id);
 
-        // this.updateRow();
-        // refreshCount
+        this.updateRow(id);
+        this.refreshCart();
       }
-      
-      if (target.closest('[data-minus]')) {
+
+      if (target.closest("[data-minus]")) {
         const id = target.dataset.minus;
         this.cartService.removeProducts(id);
-        // removeAllProducts
-        // this.updateRow();
-        // refreshCount
+
+        this.updateRow(id);
+        this.refreshCart();
       }
-      
-      if (target.closest('[data-delete]')) {
+
+      if (target.closest("[data-delete]")) {
         const id = target.dataset.delete;
         this.cartService.deleteProduct(id);
-        // refreshCount
+        this.renderCart();
       }
     });
 
     // TODO обработчик ввода
     // обновление количества в поле ввода
-    // Пересчет суммы корзины 
-    // вывод количстве элементов this.cartService.getCartLength();
-    // во все деньги добавить разряды от 10 000 // 9999 // 99 9999 // 8888
+    // Пересчет суммы корзины
+    this.cartBox.addEventListener("click", ({ target }) => {
+      const input = target.closest("[data-product-count]");
+
+      if (input) {
+        const id = input.dataset.productCount;
+        this.cartService.addProduct(id, input.value);
+        this.updateRow(id);
+        this.refreshCart();
+      }
+    });
+
+    const removeAllBtn = document.querySelector("[data-remove-cart]");
+
+    removeAllBtn.addEventListener("click", ({ target }) => {
+      // очистка корзины
+      if (target.closest("[data-remove-cart]")) {
+        this.cartService.removeAllProducts();
+        this.renderCart();
+      }
+    });
+  }
+
+  refreshCart() {
+    this.refreshCount();
+    this.refreshTotalSum();
   }
 
   refreshCount() {
-    // Товар, товара, товаров // pieces
-    // title.innerHTML = `В корзине ${this.cartService.getCartLength()} ${pieces()}`;
+    const count = this.cartService.getCartLength();
+    this.cartCount.innerHTML = `В корзине ${declOfNum(count, [
+      "товар",
+      "товара",
+      "товаров",
+    ])}`;
+  }
+
+  refreshTotalSum() {
+    const cartTotalSum = document.querySelector("#cart-products-price-num");
+    const totalSum = this.cartService.getTotalSum();
+    cartTotalSum.innerHTML = totalSum;
+  }
+
+  updateRow(id) {
+    const row = document.querySelector(`[data-id="${id}"]`);
+
+    // Обновление количества
+    const input = row.querySelector("[data-product-count]");
+    const book = this.cartService.getProduct(id);
+    input.value = book.amount;
+
+    // обновление суммы
+    const sumBox = row.querySelector("[data-price]");
+    const sum = this.cartService.getProductSum(id);
+    sumBox.innerHTML = sum;
   }
 
   renderCart(html) {
     const books = this.cartService.getProducts();
     console.log(books);
+
     let cartContent = `
       <tr class="cart__table-headers">
         <th class="cart__col-1"></th>
@@ -71,13 +121,16 @@ class Cart {
 
     //   cartContent += this.renderHtmlForCart({...book, amount: item.amount});
     // });
+
     books.forEach(({ id, amount }) => {
       const book = this.api.findBook(id);
 
       cartContent += this.renderHtmlForCart({ ...book, amount });
     });
 
-    const totalPrice = "2 220000";
+    // выводим сумму корзины
+    const totalPrice = this.cartService.getTotalSum();
+
     cartContent += `
       <tr>
         <td class="cart__products-price" colspan="5">
@@ -85,20 +138,21 @@ class Cart {
           <strong
             class="cart__products-price-num"
             id="cart-products-price-num"
-            >${totalPrice} ₽</strong
+            >${totalPrice}</strong
           >
         </td>
       </tr>
     `;
 
     this.cartBox.innerHTML = cartContent;
+    this.refreshCart();
   }
 
   renderHtmlForCart({ uri, name, price, amount }) {
     return `
-          <tr class="cart__product">
+          <tr class="cart__product" data-id="${uri}">
             <td class="cart__col-1">
-              <img class="cart__item-img" src="img/books/${uri}.jpg" alt="${uri}">
+              <img class="cart__item-img" src="img/books/${uri}.jpg" alt="${name}">
               </td>
                 <td class="cart__col-2">
                 <div class="cart__item-name">${name}</div>
@@ -108,14 +162,15 @@ class Cart {
                 <div class="field-num  field-num--bg-tran">
                     <span class="field-num__input-wrap">
                       <button class="field-num__btn-minus" data-minus="${uri}" type="button">-</button>
-                      <input class="field-num__input" type="number" value="${amount}" step="1" min="1"/>
+                      <input data-product-count="${uri}" class="field-num__input" type="number" value="${amount}" step="1" min="1"/>
                       <button class="field-num__btn-plus" data-plus="${uri}" type="button">+</button>
                     </span>
                 </div>
               </td>
 
               <td class="cart__col-4">
-                <span class="cart__item-price">${amount * price} ₽</span>
+                <span class="cart__item-price" data-price>${amount *
+                  price} ₽</span>
               </td>
 
               <td class="cart__col-5">

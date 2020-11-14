@@ -1,8 +1,13 @@
+import { toRub } from '@utils/utils';
+import apiService from "../ApiService";
+
 class CartService {
   constructor() {
+    this.api = apiService;
     this.keyName = "cart";
     this.cart = this.getProducts();
     this.cartWidget = document.querySelector(".page-header__cart-num");
+    this.cartOneCount = document.querySelector(["data-product-count"]);
 
     this.updateCartWidget();
   }
@@ -14,7 +19,7 @@ class CartService {
     return JSON.parse(productsLocalStorage);
   }
 
-  putProducts(id) {
+  getProduct(id) {
     if (!id && !id.length) return;
 
     const products = this.getProducts();
@@ -22,9 +27,30 @@ class CartService {
       return item.id === id;
     });
 
+    return products[index];
+  }
+
+  getProductSum(id) {
+    const product = this.getProduct(id)
+    const book = this.api.getBookStore(id);
+
+    return product.amount * book.price;
+  }
+
+  putProducts(id) {
+    if (!id && !id.length) return;
+
+    const products = this.getProducts();
+    const index = products.findIndex((item) => {
+      return item.id === id;
+    });;
+
     if (index !== -1) {
-      const amount = products[index].amount;
-      products[index].amount = amount + 1;
+      const store = this.api.getBookStore(products[index].id);
+      
+      if (products[index].amount < parseInt(store, 10)) {
+        products[index].amount += 1;
+      }
     } else {
       products.push({
         id,
@@ -32,9 +58,26 @@ class CartService {
       });
     }
 
+    localStorage.setItem(this.keyName, JSON.stringify(products));
     this.updateCartWidget();
+  }
+
+  addProduct(id, count) {
+    if (!id && !id.length) return;
+
+    const products = this.getProducts();
+    const index = products.findIndex((item) => {
+      return item.id === id;
+    });
+
+    const store = this.api.getBookStore(products[index].id);
+
+    if (index !== -1 && products[index].amount < store) {
+      products[index].amount = count;
+    }
 
     localStorage.setItem(this.keyName, JSON.stringify(products));
+    this.updateCartWidget();
   }
 
   removeProducts(id) {
@@ -46,18 +89,15 @@ class CartService {
     });
 
     if (index !== -1) {
-      const amount = products[index].amount;
-
-      if (amount > 1) {
-        products[index].amount = amount - 1;
+      if (products[index].amount > 1) {
+        products[index].amount -= 1;
       } else {
         this.deleteProduct(id);
       }
     }
-
-    this.updateCartWidget();
-
+    
     localStorage.setItem(this.keyName, JSON.stringify(products));
+    this.updateCartWidget();
   }
 
   deleteProduct(id) {
@@ -72,18 +112,12 @@ class CartService {
       products.splice(index, 1);
     }
 
-    this.updateCartWidget();
-
     localStorage.setItem(this.keyName, JSON.stringify(products));
+    this.updateCartWidget();
   }
 
   removeAllProducts() {
-    const books = this.getProducts();
-
-    books.forEach(({id}) => {
-      this.deleteProduct(id);
-    });
-
+    localStorage.setItem(this.keyName, JSON.stringify([]));
     this.updateCartWidget();
   }
 
@@ -91,7 +125,7 @@ class CartService {
     const cart = this.getProducts();
     let count = 0;
 
-    cart.forEach(item => {
+    cart.forEach((item) => {
       count += item.amount;
     });
 
@@ -103,7 +137,21 @@ class CartService {
   }
 
   getPromotionSum() {
+  }
 
+  getTotalSum() {
+    const cart = this.getProducts(); // [id, amount]
+    let sum = 0;
+
+    cart.forEach((item) => {
+      const book = this.api.findBook(item.id); 
+
+      sum += book.price * item.amount;
+
+      console.log(sum);
+    });
+
+    return toRub(sum);
   }
 }
 

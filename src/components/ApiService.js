@@ -1,15 +1,27 @@
 class ApiService {
-    constructor() {
-        
+  constructor() {
+    // this.findBook(id);
+  }
+
+  findBook(id) {
+    const index = books.findIndex((item) => {
+      return item.uri === id;
+    });
+
+    return books[index];
+  }
+
+  getBookStore(id) {
+    const book = this.findBook(id);
+
+    if (book) {
+      return book.store;
     }
 
-    findBook(id) {
-      const index = books.findIndex((item) => {
-        return item.uri === id;
-      });
-  
-      return books[index];
-    }
+    return 0;
+  }
 }
 
-export default ApiService;
+const apiService = new ApiService()
+
+export default apiService;

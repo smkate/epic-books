@@ -18,7 +18,7 @@ class ModalService {
 
     // escape
     window.addEventListener("keyup", (e) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" || !e.target.closest(".modal")) {
         this.close();
       }
     });
