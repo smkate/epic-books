@@ -254,6 +254,18 @@ class ApiService {
     return 0;
   }
 
+  checkPromo(promo) {
+    if (promo === "PROMOCODE") {
+      return {
+        status: 'ok'
+      };
+    } else {
+      return {
+        status: 'invalid'
+      };
+    }
+  }
+
 }
 
 const apiService = new ApiService();
@@ -273,11 +285,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @utils/utils */ "./src/assets/scripts/utils/utils.js");
 
 
+
 class Cart {
   constructor(cartService, apiService) {
     this.cartService = cartService;
     this.cartBox = document.querySelector("[data-cart-content]");
     this.cartCount = document.querySelector("[data-cart-count]");
+    this.promoCode = document.querySelector("[data-promo]");
     this.api = apiService;
 
     if (this.cartBox) {
@@ -302,7 +316,17 @@ class Cart {
 
       if (target.closest("[data-minus]")) {
         const id = target.dataset.minus;
-        this.cartService.removeProducts(id);
+        const {
+          amount
+        } = this.cartService.getProduct(id);
+
+        if (amount === 1) {
+          this.cartService.deleteProduct(id);
+          this.renderCart();
+        } else {
+          this.cartService.removeProducts(id);
+        }
+
         this.updateRow(id);
         this.refreshCart();
       }
@@ -316,7 +340,7 @@ class Cart {
     // обновление количества в поле ввода
     // Пересчет суммы корзины
 
-    this.cartBox.addEventListener("click", ({
+    this.cartBox.addEventListener("input", ({
       target
     }) => {
       const input = target.closest("[data-product-count]");
@@ -327,6 +351,31 @@ class Cart {
         this.updateRow(id);
         this.refreshCart();
       }
+    });
+    this.promoCode.addEventListener("input", () => {
+      const {
+        value
+      } = this.promoCode;
+      const promoSum = document.querySelector("[data-promo-sum]");
+      const result = this.cartService.getPromotionSum(value);
+      const label = this.promoCode.closest('.field-text--promocode');
+      label.classList.remove('field-text--input-checked', 'field-text--input-error');
+      const discount = document.querySelector('.checkout__discount'); // status
+      // promotionSum
+
+      console.log(result);
+
+      if (result.status === 'ok') {
+        // Show correct promo
+        label.classList.add('field-text--input-checked');
+        discount.style.display = 'block'; // Show sum
+
+        promoSum.innerHTML = result.totalSum;
+      } else {
+        // Show error
+        label.classList.add('field-text--input-error');
+      } // this.cartService.getPromotionSum();
+
     });
     const removeAllBtn = document.querySelector("[data-remove-cart]");
     removeAllBtn.addEventListener("click", ({
@@ -365,12 +414,11 @@ class Cart {
 
     const sumBox = row.querySelector("[data-price]");
     const sum = this.cartService.getProductSum(id);
-    sumBox.innerHTML = sum;
+    sumBox.innerHTML = Object(_utils_utils__WEBPACK_IMPORTED_MODULE_0__["toRub"])(sum);
   }
 
   renderCart(html) {
     const books = this.cartService.getProducts();
-    console.log(books);
     let cartContent = `
       <tr class="cart__table-headers">
         <th class="cart__col-1"></th>
@@ -418,6 +466,7 @@ class Cart {
     price,
     amount
   }) {
+    const rowSum = amount * price;
     return `
           <tr class="cart__product" data-id="${uri}">
             <td class="cart__col-1">
@@ -438,7 +487,7 @@ class Cart {
               </td>
 
               <td class="cart__col-4">
-                <span class="cart__item-price" data-price>${amount * price} ₽</span>
+                <span class="cart__item-price" data-price>${rowSum}&thinsp;₽</span>
               </td>
 
               <td class="cart__col-5">
@@ -524,7 +573,7 @@ class CartService {
 
   getProductSum(id) {
     const product = this.getProduct(id);
-    const book = this.api.getBookStore(id);
+    const book = this.api.findBook(id);
     return product.amount * book.price;
   }
 
@@ -534,7 +583,6 @@ class CartService {
     const index = products.findIndex(item => {
       return item.id === id;
     });
-    ;
 
     if (index !== -1) {
       const store = this.api.getBookStore(products[index].id);
@@ -559,9 +607,10 @@ class CartService {
     const index = products.findIndex(item => {
       return item.id === id;
     });
+    if (index !== -1) return;
     const store = this.api.getBookStore(products[index].id);
 
-    if (index !== -1 && products[index].amount < store) {
+    if (products[index].amount < store) {
       products[index].amount = count;
     }
 
@@ -575,13 +624,10 @@ class CartService {
     const index = products.findIndex(item => {
       return item.id === id;
     });
+    if (index !== -1) return;
 
-    if (index !== -1) {
-      if (products[index].amount > 1) {
-        products[index].amount -= 1;
-      } else {
-        this.deleteProduct(id);
-      }
+    if (products[index].amount > 1) {
+      products[index].amount -= 1;
     }
 
     localStorage.setItem(this.keyName, JSON.stringify(products));
@@ -594,11 +640,8 @@ class CartService {
     const index = products.findIndex(item => {
       return item.id === id;
     });
-
-    if (index !== -1) {
-      products.splice(index, 1);
-    }
-
+    if (index !== -1) return;
+    products.splice(index, 1);
     localStorage.setItem(this.keyName, JSON.stringify(products));
     this.updateCartWidget();
   }
@@ -619,9 +662,30 @@ class CartService {
 
   updateCartWidget() {
     this.cartWidget.innerHTML = this.getCartLength();
-  }
+  } // применяем скидку по промокоду
 
-  getPromotionSum() {}
+
+  getPromotionSum(promoCode) {
+    const result = _ApiService__WEBPACK_IMPORTED_MODULE_1__["default"].checkPromo(promoCode);
+    console.log(result); // if ((promoCode.value = "PROMOCODE")) {
+    // } else {
+    //   promoSum.innerHTML = this.getTotalSum();
+    // }
+
+    if (result.status === "ok") {
+      return {
+        status: 'ok',
+        promotionSum: 150,
+        totalSum: this.getTotalSum() - 150
+      };
+    } else {
+      return {
+        status: 'invalid',
+        promotionSum: 150,
+        totalSum: this.getTotalSum()
+      };
+    }
+  }
 
   getTotalSum() {
     const cart = this.getProducts(); // [id, amount]
@@ -629,10 +693,9 @@ class CartService {
     let sum = 0;
     cart.forEach(item => {
       const book = this.api.findBook(item.id);
-      sum += book.price * item.amount;
-      console.log(sum);
+      sum += book.price * item.amount; // console.log(sum);
     });
-    return Object(_utils_utils__WEBPACK_IMPORTED_MODULE_0__["toRub"])(sum);
+    return sum;
   }
 
 }
@@ -848,14 +911,7 @@ class ModalService {
       if (e.key === "Escape" || !e.target.closest(".modal")) {
         this.close();
       }
-    }); // Добавление в корзину
-    // const btnModal = document.querySelector(".btn__sm-text");
-    // console.log(btnModal);
-    // btnModal.addEventListener("click", () => {
-    // const { id } = card.dataset;
-    // this.addProductToCart(id);
-    //   this.close();
-    // });
+    });
   }
 
   open(html) {

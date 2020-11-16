@@ -351,18 +351,20 @@
                                 </div>
                             </div>
                             <!-- field-text--input-error для ошибочного состояния поля с промокодом-->
-                            <label class="field-text  field-text--bg-gray field-text--promocode field-text--input-checked cart__promocode">
+                            <label class="field-text  field-text--bg-gray field-text--promocode cart__promocode">
                                 <span class="field-text__name">Промокод</span>
                                 <span class="field-text__input-wrap">
                     <input
+                      data-promo
                       class="field-text__input"
                       type="text"
-                      value="CORRECT_CODE"
                       name="promocode"
+                      placeholder="CORRECT_CODE"
                     />
                   </span>
                             </label>
-                            <p class="checkout__discount">
+
+                            <p class="checkout__discount" style="display: none;">
                                 Скидка:
                                 <strong
                     class="checkout__discount-num"
@@ -373,7 +375,8 @@
                         <div class="field-actions">
                             <p class="checkout__all-price">
                                 Итого к оплате:
-                                <strong class="checkout__price">2 200 ₽</strong>
+                                <strong data-promo-sum class="checkout__price"
+                    >2 200 ₽</strong>
                             </p>
                             <button class="btn  btn--shadow">Оплатить</button>
                             <p class="checkout__conditions">

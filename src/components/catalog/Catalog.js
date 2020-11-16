@@ -1,4 +1,4 @@
-import apiService from '../ApiService'
+import apiService from "../ApiService";
 
 class Catalog {
   constructor(selector, cartService, modalService) {

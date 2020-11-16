@@ -1,4 +1,4 @@
-import { toRub } from '@utils/utils';
+import { toRub } from "@utils/utils";
 import apiService from "../ApiService";
 
 class CartService {
@@ -13,6 +13,7 @@ class CartService {
   }
 
   getProducts() {
+    // GET /books
     const productsLocalStorage = localStorage.getItem(this.keyName);
     if (!productsLocalStorage) return [];
 
@@ -20,6 +21,7 @@ class CartService {
   }
 
   getProduct(id) {
+    // GET /books/:id
     if (!id && !id.length) return;
 
     const products = this.getProducts();
@@ -31,8 +33,9 @@ class CartService {
   }
 
   getProductSum(id) {
-    const product = this.getProduct(id)
-    const book = this.api.getBookStore(id);
+    // GET /cart/:id/sum
+    const product = this.getProduct(id);
+    const book = this.api.findBook(id);
 
     return product.amount * book.price;
   }
@@ -43,11 +46,11 @@ class CartService {
     const products = this.getProducts();
     const index = products.findIndex((item) => {
       return item.id === id;
-    });;
+    });
 
     if (index !== -1) {
       const store = this.api.getBookStore(products[index].id);
-      
+
       if (products[index].amount < parseInt(store, 10)) {
         products[index].amount += 1;
       }
@@ -70,9 +73,11 @@ class CartService {
       return item.id === id;
     });
 
+    if (index !== -1) return;
+
     const store = this.api.getBookStore(products[index].id);
 
-    if (index !== -1 && products[index].amount < store) {
+    if (products[index].amount < store) {
       products[index].amount = count;
     }
 
@@ -88,14 +93,12 @@ class CartService {
       return item.id === id;
     });
 
-    if (index !== -1) {
-      if (products[index].amount > 1) {
-        products[index].amount -= 1;
-      } else {
-        this.deleteProduct(id);
-      }
+    if (index !== -1) return;
+
+    if (products[index].amount > 1) {
+      products[index].amount -= 1;
     }
-    
+
     localStorage.setItem(this.keyName, JSON.stringify(products));
     this.updateCartWidget();
   }
@@ -108,9 +111,9 @@ class CartService {
       return item.id === id;
     });
 
-    if (index !== -1) {
-      products.splice(index, 1);
-    }
+    if (index !== -1) return;
+
+    products.splice(index, 1);
 
     localStorage.setItem(this.keyName, JSON.stringify(products));
     this.updateCartWidget();
@@ -136,7 +139,28 @@ class CartService {
     this.cartWidget.innerHTML = this.getCartLength();
   }
 
-  getPromotionSum() {
+  // применяем скидку по промокоду
+  getPromotionSum(promoCode) {
+    const result = apiService.checkPromo(promoCode);
+
+    console.log(result);
+    // if ((promoCode.value = "PROMOCODE")) {
+    // } else {
+    //   promoSum.innerHTML = this.getTotalSum();
+    // }
+    if (result.status === "ok") {
+      return {
+        status: "ok",
+        promotionSum: 150,
+        totalSum: this.getTotalSum() - 150,
+      };
+    } else {
+      return {
+        status: "invalid",
+        promotionSum: 150,
+        totalSum: this.getTotalSum(),
+      };
+    }
   }
 
   getTotalSum() {
@@ -144,14 +168,14 @@ class CartService {
     let sum = 0;
 
     cart.forEach((item) => {
-      const book = this.api.findBook(item.id); 
+      const book = this.api.findBook(item.id);
 
       sum += book.price * item.amount;
 
-      console.log(sum);
+      // console.log(sum);
     });
 
-    return toRub(sum);
+    return sum;
   }
 }
 

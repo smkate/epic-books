@@ -20,8 +20,20 @@ class ApiService {
 
     return 0;
   }
+
+  checkPromo(promo) {
+    if (promo === "PROMOCODE") {
+      return {
+        status: 'ok',
+      };
+    } else {
+      return {
+        status: 'invalid',
+      };
+    }
+  }
 }
 
-const apiService = new ApiService()
+const apiService = new ApiService();
 
 export default apiService;

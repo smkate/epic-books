@@ -22,15 +22,6 @@ class ModalService {
         this.close();
       }
     });
-
-    // Добавление в корзину
-    // const btnModal = document.querySelector(".btn__sm-text");
-    // console.log(btnModal);
-    // btnModal.addEventListener("click", () => {
-    // const { id } = card.dataset;
-    // this.addProductToCart(id);
-    //   this.close();
-    // });
   }
 
   open(html) {

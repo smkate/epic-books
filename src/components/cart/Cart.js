@@ -1,10 +1,12 @@
 import { declOfNum } from "@utils/utils";
+import { toRub } from "../../assets/scripts/utils/utils";
 
 class Cart {
   constructor(cartService, apiService) {
     this.cartService = cartService;
     this.cartBox = document.querySelector("[data-cart-content]");
     this.cartCount = document.querySelector("[data-cart-count]");
+    this.promoCode = document.querySelector("[data-promo]");
     this.api = apiService;
 
     if (this.cartBox) {
@@ -29,7 +31,14 @@ class Cart {
 
       if (target.closest("[data-minus]")) {
         const id = target.dataset.minus;
-        this.cartService.removeProducts(id);
+        const { amount } = this.cartService.getProduct(id);
+
+        if (amount === 1) {
+          this.cartService.deleteProduct(id);
+          this.renderCart();
+        } else {
+          this.cartService.removeProducts(id);
+        }
 
         this.updateRow(id);
         this.refreshCart();
@@ -45,7 +54,7 @@ class Cart {
     // TODO обработчик ввода
     // обновление количества в поле ввода
     // Пересчет суммы корзины
-    this.cartBox.addEventListener("click", ({ target }) => {
+    this.cartBox.addEventListener("input", ({ target }) => {
       const input = target.closest("[data-product-count]");
 
       if (input) {
@@ -54,6 +63,36 @@ class Cart {
         this.updateRow(id);
         this.refreshCart();
       }
+    });
+
+    this.promoCode.addEventListener("input", () => {
+      const { value } = this.promoCode;
+
+      const promoSum = document.querySelector("[data-promo-sum]");
+      const result = this.cartService.getPromotionSum(value);
+      const label = this.promoCode.closest(".field-text--promocode");
+      label.classList.remove(
+        "field-text--input-checked",
+        "field-text--input-error"
+      );
+      const discount = document.querySelector(".checkout__discount");
+      // status
+      // promotionSum
+
+      console.log(result);
+
+      if (result.status === "ok") {
+        // Show correct promo
+        label.classList.add("field-text--input-checked");
+        discount.style.display = "block";
+
+        // Show sum
+        promoSum.innerHTML = result.totalSum;
+      } else {
+        // Show error
+        label.classList.add("field-text--input-error");
+      }
+      // this.cartService.getPromotionSum();
     });
 
     const removeAllBtn = document.querySelector("[data-remove-cart]");
@@ -98,12 +137,11 @@ class Cart {
     // обновление суммы
     const sumBox = row.querySelector("[data-price]");
     const sum = this.cartService.getProductSum(id);
-    sumBox.innerHTML = sum;
+    sumBox.innerHTML = toRub(sum);
   }
 
   renderCart(html) {
     const books = this.cartService.getProducts();
-    console.log(books);
 
     let cartContent = `
       <tr class="cart__table-headers">
@@ -149,6 +187,8 @@ class Cart {
   }
 
   renderHtmlForCart({ uri, name, price, amount }) {
+    const rowSum = amount * price;
+
     return `
           <tr class="cart__product" data-id="${uri}">
             <td class="cart__col-1">
@@ -169,8 +209,7 @@ class Cart {
               </td>
 
               <td class="cart__col-4">
-                <span class="cart__item-price" data-price>${amount *
-                  price} ₽</span>
+                <span class="cart__item-price" data-price>${rowSum}&thinsp;₽</span>
               </td>
 
               <td class="cart__col-5">

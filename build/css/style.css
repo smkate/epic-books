@@ -1286,17 +1286,37 @@ textarea.field-text__input {
 }
 .field-text--input-checked .field-text__input {
   padding-right: 50px;
+}
+.field-text--input-checked .field-text__input-wrap,
+.field-text--input-error .field-text__input-wrap {
+  position: relative;
+}
+.field-text--input-checked .field-text__input-wrap:after {
+  content: "";
+  position: absolute;
+  width: 45px;
+  height: 45px;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='22' height='22'%3E%3Cdefs%3E%3Cpath id='a' d='M16.696 7.31a1.042 1.042 0 0 0-1.485 0L9.24 13.403l-2.442-2.518a1.06 1.06 0 0 0-1.5.016 1.115 1.115 0 0 0 .007 1.525l3.146 3.198.046.054c.414.43 1.08.43 1.493 0l6.706-6.85a1.097 1.097 0 0 0 0-1.516z'/%3E%3C/defs%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Crect width='22' height='22' fill='%232F75EC' rx='11'/%3E%3Cuse fill='%23FFF' xlink:href='%23a'/%3E%3C/g%3E%3C/svg%3E");
   background-position: right 22px center;
   background-repeat: no-repeat;
+  right: -10px;
+  z-index: 1;
 }
 .field-text--input-error .field-text__input {
   padding-right: 50px;
   border-color: #f63f45;
   background-color: rgba(246, 63, 69, 0.04);
+}
+.field-text--input-error .field-text__input-wrap:after {
+  content: "";
+  position: absolute;
+  width: 45px;
+  height: 45px;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Crect width='22' height='22' fill='%23F63F45' rx='11'/%3E%3Cpath fill='%23FFF' fill-rule='nonzero' d='M14.73 8.576L12.306 11l2.424 2.424a.923.923 0 0 1-1.305 1.306L11 12.305 8.576 14.73a.92.92 0 0 1-1.305 0 .923.923 0 0 1 0-1.306L9.694 11 7.27 8.576A.923.923 0 0 1 8.576 7.27L11 9.694l2.424-2.424a.923.923 0 0 1 1.306 1.306z'/%3E%3C/g%3E%3C/svg%3E");
   background-position: right 22px center;
   background-repeat: no-repeat;
+  right: -10px;
+  z-index: 1;
 }
 .field-text--error .field-text__name,
 .field-text--error .field-text__input,
